@@ -34,7 +34,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     bert = BertModel.from_pretrained(hyp_params.bert_model)
     tokenizer = BertTokenizer.from_pretrained(hyp_params.bert_model)
 
-    feature_extractor = torch.hub.load('pytorch/vision:v0.6.0', hyp_params.cnn_model, pretrained=True)
+    feature_extractor = torch.hub.load('pytorch/vision:v0.16.0', hyp_params.cnn_model, pretrained=True)
     for param in feature_extractor.features.parameters():
         param.requires_grad = False
 
