@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description='Meme Hatefulness detection')
 parser.add_argument('--model', type=str, default='AverageBERT', help='name of the model to use (Transformer, etc.)')
 
 # Tasks
-parser.add_argument('--data_path', type=str, default='data', help='path for storing the dataset')
+parser.add_argument('--data_path', type=str, default='data/dataset', help='path for storing the dataset')
 
 # Dropouts
 parser.add_argument('--mlp_dropout', type=float, default=0.2, help='fully connected layers dropout')
