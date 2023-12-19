@@ -2,17 +2,17 @@ import pandas as pd
 import numpy as np
 import os
 
-users = pd.read_csv('ml1m/content/dataset/users.dat', sep='::',
+users = pd.read_csv('data/dataset/users.dat', sep='::',
                         engine='python',
                         names=['userid', 'gender', 'age', 'occupation', 'zip']).set_index('userid')
 
-ratings = pd.read_csv('ml1m/content/dataset/ratings.dat', engine='python',
+ratings = pd.read_csv('data/dataset/ratings.dat', engine='python',
                           sep='::', names=['userid', 'movieid', 'rating', 'timestamp'])
 
-movies_train = pd.read_csv('ml1m/content/dataset/movies_train.dat', engine='python',
+movies_train = pd.read_csv('data/dataset/movies_train.dat', engine='python',
                          sep='::', names=['movieid', 'title', 'genre'], encoding='latin-1', index_col=False).set_index('movieid')
 
-movies_test = pd.read_csv('ml1m/content/dataset/movies_test.dat', engine='python',
+movies_test = pd.read_csv('data/dataset/movies_test.dat', engine='python',
                          sep='::', names=['movieid', 'title', 'genre'], encoding='latin-1', index_col=False).set_index('movieid')
 
 movies_train['genre'] = movies_train.genre.str.split('|')
