@@ -15,8 +15,8 @@ movies_train = pd.read_csv('data/dataset/movies_train.dat', engine='python',
 movies_test = pd.read_csv('data/dataset/movies_test.dat', engine='python',
                          sep='::', names=['movieid', 'title', 'genre'], encoding='latin-1', index_col=False).set_index('movieid')
 
-movies_train['genre'] = movies_train.genre.str.split('|')
-movies_test['genre'] = movies_test.genre.str.split('|')
+# movies_train['genre'] = movies_train.genre.str.split('|')
+# movies_test['genre'] = movies_test.genre.str.split('|')
 
 users.age = users.age.astype('category')
 users.gender = users.gender.astype('category')
