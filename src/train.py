@@ -16,7 +16,7 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import accuracy_score, f1_score
-from src.eval_metrics import *
+from src.metrics import *
 
 import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
