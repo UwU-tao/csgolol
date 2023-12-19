@@ -46,11 +46,11 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 
-use_cuda = False
+use_cuda = True
 
 output_dim = 18
 
-criterion_dict = 'CrossEntropyLoss'
+criterion = 'CrossEntropyLoss'
 
 torch.set_default_tensor_type('torch.FloatTensor')
 
@@ -87,8 +87,8 @@ if test_data is None:
 else:
     hyp_params.n_test = len(test_data)
 hyp_params.model = args.model.strip()
-hyp_params.output_dim = output_dim_dict.get(dataset)
-hyp_params.criterion = criterion_dict.get(dataset)
+hyp_params.output_dim = output_dim
+hyp_params.criterion = criterion
 
 if __name__ == '__main__':
     test_loss = train.initiate(hyp_params, train_loader, valid_loader, test_loader)
