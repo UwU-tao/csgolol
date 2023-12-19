@@ -81,7 +81,6 @@ print('Finish loading the data....')
 
 hyp_params = args
 hyp_params.use_cuda = use_cuda
-hyp_params.dataset = dataset
 hyp_params.n_train, hyp_params.n_valid = len(train_data), len(valid_data)
 if test_data is None:
     pass
