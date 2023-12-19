@@ -59,11 +59,12 @@ for ftype in data.keys():
   data[ftype].reset_index(drop=True, inplace=True)
   idx = []
   for i in range(len(data[ftype])):
-      if not os.path.isfile('/content/ml1m/content/dataset/ml1m-images/' + str(data[ftype].iloc[i]['movieid']) + '.jpg'):
+      if not os.path.isfile('data/dataset/ml1m-images/' + str(data[ftype].iloc[i]['movieid']) + '.jpg'):
           idx.append(i)
 
   data[ftype].drop(idx, inplace=True)
   data[ftype].reset_index(drop=True, inplace=True)
   
-data['train'].to_csv('ml1m/content/dataset/train.dat', index=False)
-data['dev'].to_csv('ml1m/content/dataset/dev.dat', index=False)
+data['train'].to_csv('data/dataset/train.dat', index=False)
+data['dev'].to_csv('data/dataset/dev.dat', index=False)
+data['test'].to_csv('data/dataset/test.dat', index=False)
