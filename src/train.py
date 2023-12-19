@@ -39,9 +39,9 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
         param.requires_grad = False
 
     if hyp_params.use_cuda:
-        model = model.cuda()
-        bert = bert.cuda()
-        feature_extractor = feature_extractor.cuda()
+        model.to(torch.device("cuda"))
+        bert.to(torch.device("cuda"))
+        feature_extractor.to(torch.device("cuda"))
 
     optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr)
     criterion = getattr(nn, hyp_params.criterion)()
@@ -107,10 +107,12 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
             if hyp_params.use_cuda:
                 with torch.cuda.device(0):
-                    input_ids = text_encoded['input_ids'].cuda()
-                    attention_mask = text_encoded['attention_mask'].cuda()
-                    targets = targets.cuda()
-                    images = images.cuda()
+                    text_encoded['input_ids'].to(torch.device("cuda"))
+                    input_ids =  text_encoded['input_ids']
+                    text_encoded['attention_mask'].to(torch.device("cuda"))
+                    attention_mask = text_encoded['attention_mask']
+                    targets.to(torch.device("cuda"))
+                    images.to(torch.device("cuda"))
 
             if images.size()[0] != input_ids.size()[0]:
                 continue
@@ -191,11 +193,12 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 )
 
                 if hyp_params.use_cuda:
-                    with torch.cuda.device(0):
-                        input_ids = text_encoded['input_ids'].cuda()
-                        attention_mask = text_encoded['attention_mask'].cuda()
-                        targets = targets.cuda()
-                        images = images.cuda()
+                    text_encoded['input_ids'].to(torch.device("cuda"))
+                    input_ids = text_encoded['input_ids']
+                    text_encoded['attention_mask'].to(torch.device("cuda"))
+                    attention_mask = text_encoded['attention_mask']
+                    targets.to(torch.device("cuda"))
+                    images.to(torch.device("cuda"))
 
                 if images.size()[0] != input_ids.size()[0]:
                     continue
