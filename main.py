@@ -45,8 +45,6 @@ parser.add_argument('--num_workers', type=int, default=6, help='number of worker
 args = parser.parse_args()
 
 torch.manual_seed(args.seed)
-dataset = str.lower(args.dataset.strip())
-print(dataset)
 
 use_cuda = False
 
