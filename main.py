@@ -55,9 +55,9 @@ train_data = get_data(args, 'train')
 valid_data = get_data(args, 'dev')
 test_data = get_data(args, 'test')
 
-train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
+train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, generator=torch.Generator(device='cuda'))
+valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, generator=torch.Generator(device='cuda'))
+test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, generator=torch.Generator(device='cuda'))
 print('Finish loading the data....')
 
 
