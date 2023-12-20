@@ -62,7 +62,6 @@ print('Finish loading the data....')
 
 
 hyp_params = args
-hyp_params.use_cuda = use_cuda
 hyp_params.n_train, hyp_params.n_valid, hyp_params.n_test = len(train_data), len(valid_data), len(test_data)
     
 hyp_params.model = args.model.strip()
