@@ -35,7 +35,7 @@ parser.add_argument('--when', type=int, default=2, help='when to decay learning 
 parser.add_argument('--log_interval', type=int, default=100, help='frequency of result logging (default: 100)')
 parser.add_argument('--seed', type=int, default=2023, help='random seed')
 parser.add_argument('--name', type=str, default='model', help='name of the trial (default: "model")')
-parser.add_argument('--num_workers', type=int, default=6, help='number of workers to use for DataLoaders (default: 6)')
+parser.add_argument('--num_workers', type=int, default=2, help='number of workers to use for DataLoaders (default: 2)')
 
 args = parser.parse_args()
 
