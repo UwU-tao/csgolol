@@ -25,8 +25,6 @@ ratings.movieid = ratings.movieid.astype('category')
 ratings.userid = ratings.userid.astype('category')
 
 
-
-
 folder_img_path = 'data'
 
 movies_train.reset_index(inplace=True)

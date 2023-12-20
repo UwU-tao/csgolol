@@ -5,11 +5,6 @@ from src.utils import *
 from src import train
 
 import os
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1,2"
-
-
-parser = argparse.ArgumentParser(description='Meme Hatefulness detection')
 
 # Fixed
 parser.add_argument('--model', type=str, default='AverageBERT', help='name of the model to use (Transformer, etc.)')
@@ -37,8 +32,7 @@ parser.add_argument('--when', type=int, default=2, help='when to decay learning 
 
 # Logistics
 parser.add_argument('--log_interval', type=int, default=100, help='frequency of result logging (default: 100)')
-parser.add_argument('--seed', type=int, default=1111, help='random seed')
-parser.add_argument('--no_cuda', action='store_true', help='do not use cuda')
+parser.add_argument('--seed', type=int, default=2023, help='random seed')
 parser.add_argument('--name', type=str, default='model', help='name of the trial (default: "model")')
 parser.add_argument('--num_workers', type=int, default=6, help='number of workers to use for DataLoaders (default: 6)')
 
@@ -46,46 +40,30 @@ args = parser.parse_args()
 
 torch.manual_seed(args.seed)
 
-use_cuda = True
-
 output_dim = 18
 
 criterion = 'CrossEntropyLoss'
 
 torch.set_default_tensor_type('torch.FloatTensor')
 
-if torch.cuda.is_available():
-    if args.no_cuda:
-        print("WARNING: You have a CUDA device, so you should probably not run with --no_cuda")
-    else:
-        torch.cuda.manual_seed(args.seed)
-        torch.set_default_tensor_type('torch.cuda.FloatTensor')
-        use_cuda = True
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 print("Start loading the data....")
-
 train_data = get_data(args, 'train')
 valid_data = get_data(args, 'dev')
 test_data = get_data(args, 'test')
 
 train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-
-if test_data is None:
-    test_loader = None
-else:
-    test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-
+test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 print('Finish loading the data....')
+
 
 hyp_params = args
 hyp_params.use_cuda = use_cuda
-hyp_params.n_train, hyp_params.n_valid = len(train_data), len(valid_data)
-if test_data is None:
-    pass
-else:
-    hyp_params.n_test = len(test_data)
+hyp_params.n_train, hyp_params.n_valid, hyp_params.n_test = len(train_data), len(valid_data), len(test_data)
+    
 hyp_params.model = args.model.strip()
 hyp_params.output_dim = output_dim
 hyp_params.criterion = criterion

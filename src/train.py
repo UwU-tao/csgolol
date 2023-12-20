@@ -1,47 +1,37 @@
 from src import models
 from src.utils import *
-import torch.optim as optim
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch import nn
-import torch
-from transformers import BertModel
-from transformers import BertTokenizer
 import numpy as np
 import time
 import sys
 
-from torch.utils.tensorboard import SummaryWriter
+from transformers import BertModel
+from transformers import BertTokenizer
 
-from sklearn.metrics import classification_report
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import precision_recall_fscore_support
-from sklearn.metrics import accuracy_score, f1_score
+import torch
+import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch import nn
+from torch.utils.tensorboard import SummaryWriter
+from torchmetrics.classification import MultilabelF1Score, MultilabelRecall, MultilabelPrecision
+import torchvision.models as models
+
 from src.metrics import *
 
 import os
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1,2"
 
-
-####################################################################
-#
-# Construct the model
-#
-####################################################################
 
 def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     model = getattr(models, hyp_params.model+'Model')(hyp_params)
     bert = BertModel.from_pretrained(hyp_params.bert_model)
     tokenizer = BertTokenizer.from_pretrained(hyp_params.bert_model)
 
-    feature_extractor = torch.hub.load('pytorch/vision:v0.16.0', hyp_params.cnn_model, pretrained=True)
+    feature_extractor = torch.hub.load('pytorch/vision', hyp_params.cnn_model)
     for param in feature_extractor.features.parameters():
         param.requires_grad = False
 
-    if hyp_params.use_cuda:
-        model.to(torch.device("cuda"))
-        bert.to(torch.device("cuda"))
-        feature_extractor.to(torch.device("cuda"))
+    model.to(hyp_params.device)
+    bert.to(hyp_params.device)
+    feature_extractor.to(hyp_params.device)
 
     optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr)
     criterion = getattr(nn, hyp_params.criterion)()
@@ -84,35 +74,20 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         losses = []
         results = []
         truths = []
-        n_examples = hyp_params.n_train
-        start_time = time.time()
 
-        for i_batch, data_batch in enumerate(train_loader):
+        for data_batch in tqdm(train_loader):
             
             input_ids = data_batch["input_ids"]
             targets = data_batch["label"]
             images = data_batch['image']
             
-            text_encoded = tokenizer.batch_encode_plus(
-                input_ids,
-                add_special_tokens=True,
-                max_length=hyp_params.max_token_length,
-                return_token_type_ids=False,
-                pad_to_max_length=True,
-                return_attention_mask=True,
-                return_tensors='pt',
-            )
+            text_encoded = tokenizer(input_ids, padding=True)
 
-            model.zero_grad()
-
-            if hyp_params.use_cuda:
-                with torch.cuda.device(0):
-                    text_encoded['input_ids'].to(torch.device("cuda"))
-                    input_ids =  text_encoded['input_ids']
-                    text_encoded['attention_mask'].to(torch.device("cuda"))
-                    attention_mask = text_encoded['attention_mask']
-                    targets.to(torch.device("cuda"))
-                    images.to(torch.device("cuda"))
+            input_ids = text_encoded['input_ids'].to(hyp_params.device)
+            attention_mask = text_encoded['attention_mask'].to(hyp_params.device)
+            
+            targets.to(hyp_params.device)
+            images.to(hyp_params.device)
 
             if images.size()[0] != input_ids.size()[0]:
                 continue
@@ -128,39 +103,34 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 attention_mask=attention_mask
             )
 
+            optimizer.zero_grad()
             outputs = model(
                 last_hidden=last_hidden,
                 pooled_output=pooled_output,
                 feature_images=feature_images
             )
     
-            if hyp_params.dataset == 'meme_dataset':
-                _, preds = torch.max(outputs, dim=1)
-            else:
-                preds = outputs
-                
+            preds = outputs
             preds_round = (preds > 0.5).float()
             loss = criterion(outputs, targets)
             losses.append(loss.item())
             loss.backward()
             nn.utils.clip_grad_norm_(model.parameters(), hyp_params.clip)
             optimizer.step()
-            #optimizer.zero_grad()
             
             total_loss += loss.item() * hyp_params.batch_size
             results.append(preds)
             truths.append(targets)
 
-            proc_loss += loss * hyp_params.batch_size
-            proc_size += hyp_params.batch_size
-            if i_batch % hyp_params.log_interval == 0 and i_batch > 0:
-                train_acc, train_f1 = metrics(preds_round, targets)
-                avg_loss = proc_loss / proc_size
-                elapsed_time = time.time() - start_time
-                print('Epoch {:2d} | Batch {:3d}/{:3d} | Time/Batch(ms) {:5.2f} | Train Loss {:5.4f} | Train Acc {:5.4f} | Train f1-score {:5.4f}'.
-                      format(epoch, i_batch, num_batches, elapsed_time * 1000 / hyp_params.log_interval, avg_loss, train_acc, train_f1))
-                proc_loss, proc_size = 0, 0
-                start_time = time.time()
+            # proc_loss += loss * hyp_params.batch_size
+            # proc_size += hyp_params.batch_size
+            
+            # if i_batch % hyp_params.log_interval == 0 and i_batch > 0:
+            #     train_acc, train_f1 = metrics(preds_round, targets)
+            #     avg_loss = proc_loss / proc_size
+            #     print('Epoch {:2d} | Batch {:3d}/{:3d} | Time/Batch(ms) {:5.2f} | Train Loss {:5.4f} | Train Acc {:5.4f} | Train f1-score {:5.4f}'.
+            #           format(epoch, i_batch, num_batches, elapsed_time * 1000 / hyp_params.log_interval, avg_loss, train_acc, train_f1))
+            # proc_loss, proc_size = 0, 0
                 
         avg_loss = total_loss / hyp_params.n_train
         results = torch.cat(results)
@@ -177,28 +147,18 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         correct_predictions = 0
 
         with torch.no_grad():
-            for i_batch, data_batch in enumerate(loader):
+            for data_batch in loader:
+                
                 input_ids = data_batch["input_ids"]
                 targets = data_batch["label"]
                 images = data_batch['image']
                 
-                text_encoded = tokenizer.batch_encode_plus(
-                    input_ids,
-                    add_special_tokens=True,
-                    max_length=hyp_params.max_token_length,
-                    return_token_type_ids=False,
-                    pad_to_max_length=True,
-                    return_attention_mask=True,
-                    return_tensors='pt',
-                )
+                text_encoded = tokenizer(input_ids, padding=True)
 
-                if hyp_params.use_cuda:
-                    text_encoded['input_ids'].to(torch.device("cuda"))
-                    input_ids = text_encoded['input_ids']
-                    text_encoded['attention_mask'].to(torch.device("cuda"))
-                    attention_mask = text_encoded['attention_mask']
-                    targets.to(torch.device("cuda"))
-                    images.to(torch.device("cuda"))
+                input_ids = text_encoded['input_ids'].to(hyp_params.device)
+                attention_mask = text_encoded['attention_mask'].to(hyp_params.device)
+                targets.to(hyp_params.device)
+                images.to(hyp_params.device)
 
                 if images.size()[0] != input_ids.size()[0]:
                     continue
@@ -219,11 +179,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                     pooled_output=pooled_output,
                     feature_images=feature_images
                 )
-
-                if hyp_params.dataset == 'meme_dataset':
-                    _, preds = torch.max(outputs, dim=1)
-                else:
-                    preds = outputs
+                preds = outputs
                 
                 total_loss += criterion(outputs, targets).item() * hyp_params.batch_size
                 correct_predictions += torch.sum(preds == targets)
@@ -240,15 +196,12 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
     best_valid = 1e8
     writer = SummaryWriter('runs/'+hyp_params.model)
+    
     for epoch in range(1, hyp_params.num_epochs+1):
-        start = time.time()
         train_results, train_truths, train_loss = train(model, bert, tokenizer, feature_extractor, optimizer, criterion)
         results, truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=False)
         #if test_loader is not None:
         #    results, truths, val_loss = evaluate(model, feature_extractor, criterion, test=True)
-
-        end = time.time()
-        duration = end-start
         scheduler.step(val_loss)
 
         train_acc, train_f1 = metrics(train_results, train_truths)
