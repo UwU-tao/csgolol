@@ -13,7 +13,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch import nn
 from torch.utils.tensorboard import SummaryWriter
 from torchmetrics.classification import MultilabelF1Score, MultilabelRecall, MultilabelPrecision
-import torchvision.models as models
+# import torchvision.models as models
 
 from src.metrics import *
 
