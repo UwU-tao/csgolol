@@ -104,12 +104,11 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
             with torch.no_grad():
               outs = bert(**text_encoded)
-              outs = linear(outs)
             
             optimizer.zero_grad()
             outputs = model(
-                last_hidden=outs.last_hidden_state,
-                pooled_output=outs.pooler_output,
+                last_hidden=linear(outs.last_hidden_state),
+                pooled_output=linear(outs.pooler_output),
                 feature_images=feature_images
             )
     
@@ -174,11 +173,10 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 
                 with torch.no_grad():
                   outs = bert(**text_encoded)
-                  outs = linear(outs)
                 
                 outputs = model(
-                    last_hidden=outs.last_hidden_state,
-                    pooled_output=outs.pooler_output,
+                    last_hidden=linear(outs.last_hidden_state),
+                    pooled_output=linear(outs.pooler_output),
                     feature_images=feature_images
                 )
                 preds = outputs
