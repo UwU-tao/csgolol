@@ -45,7 +45,7 @@ output_dim = 18
 
 criterion = 'CrossEntropyLoss'
 
-torch.set_default_tensor_type(torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor)
+torch.set_default_tensor_type(torch.FloatTensor)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
