@@ -25,7 +25,7 @@ ratings.movieid = ratings.movieid.astype('category')
 ratings.userid = ratings.userid.astype('category')
 
 
-folder_img_path = 'data'
+folder_img_path = 'data/dataset/ml1m-images'
 
 movies_train.reset_index(inplace=True)
 movies_train['img_path'] = movies_train.apply(lambda row: os.path.join(folder_img_path, f'{row.movieid}.jpg'), axis = 1)
