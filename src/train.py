@@ -38,7 +38,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
 
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=hyp_params.when, factor=0.1, verbose=True)
 
-    linear = nn.nn.Linear(786, 20)
+    linear = nn.Linear(786, 20)
     
     settings = {'model': model,
                 'bert': bert,
