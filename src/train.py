@@ -81,10 +81,10 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             targets = data_batch["label"]
             images = data_batch['image']
             
-            text_encoded = tokenizer(input_ids, padding=True)
+            text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt')
 
-            input_ids = torch.tensor(text_encoded['input_ids']).to(hyp_params.device)
-            attention_mask = torch.tensor(text_encoded['attention_mask']).to(hyp_params.device)
+            input_ids = text_encoded['input_ids'].clone().detach().to(hyp_params.device)
+            attention_mask = text_encoded['attention_mask'].clone().detach().to(hyp_params.device)
             
             targets.to(hyp_params.device)
             images.to(hyp_params.device)
@@ -97,16 +97,19 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 feature_images = feature_extractor.avgpool(feature_images)
                 feature_images = torch.flatten(feature_images, 1)
                 feature_images = feature_extractor.classifier[0](feature_images)
-            
-            last_hidden, pooled_output = bert(
-                input_ids=input_ids,
-                attention_mask=attention_mask
-            )
+
+            with torch.no_grad():
+              outs = bert(**text_encoded)
+
+            # last_hidden, pooled_output = bert(
+            #     input_ids=input_ids,
+            #     attention_mask=attention_mask
+            # )
 
             optimizer.zero_grad()
             outputs = model(
-                last_hidden=last_hidden,
-                pooled_output=pooled_output,
+                last_hidden=outs.last_hidden_state,
+                pooled_output=outs.pooler_output,
                 feature_images=feature_images
             )
     
@@ -153,10 +156,10 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 targets = data_batch["label"]
                 images = data_batch['image']
                 
-                text_encoded = tokenizer(input_ids, padding=True)
-
-                input_ids = torch.tensor(text_encoded['input_ids']).to(hyp_params.device)
-                attention_mask = torch.tensor(text_encoded['attention_mask']).to(hyp_params.device)
+                text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt')
+ 
+                input_ids = text_encoded['input_ids'].clone().detach().to(hyp_params.device)
+                attention_mask = text_encoded['attention_mask'].clone().detach().to(hyp_params.device)
                 targets.to(hyp_params.device)
                 images.to(hyp_params.device)
 
@@ -168,15 +171,17 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                     feature_images = feature_extractor.avgpool(feature_images)
                     feature_images = torch.flatten(feature_images, 1)
                     feature_images = feature_extractor.classifier[0](feature_images)
-                    
-                last_hidden, pooled_output = bert(
-                    input_ids=input_ids,
-                    attention_mask=attention_mask
-                )
+                
+                with torch.no_grad():
+                  outs = bert(**text_encoded)
+                # last_hidden, pooled_output = bert(
+                #     input_ids=input_ids,
+                #     attention_mask=attention_mask
+                # )
 
                 outputs = model(
-                    last_hidden=last_hidden,
-                    pooled_output=pooled_output,
+                    last_hidden=outs.last_hidden_state,
+                    pooled_output=outs.pooler_output,
                     feature_images=feature_images
                 )
                 preds = outputs
