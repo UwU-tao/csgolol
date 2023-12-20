@@ -62,7 +62,10 @@ for ftype in data.keys():
 
   data[ftype].drop(idx, inplace=True)
   data[ftype].reset_index(drop=True)
-  
+
+data['train'].dropna(inplace=True)
+data['dev'].dropna(inplace=True)
+data['test'].dropna(inplace=True)
 data['train'].to_csv('data/dataset/train.dat', index=False, header=False)
 data['dev'].to_csv('data/dataset/dev.dat', index=False, header=False)
 data['test'].to_csv('data/dataset/test.dat', index=False, header=False)
