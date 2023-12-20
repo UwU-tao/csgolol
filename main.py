@@ -6,6 +6,7 @@ from src import train
 
 import os
 
+parser = argparse.ArgumentParser()
 # Fixed
 parser.add_argument('--model', type=str, default='AverageBERT', help='name of the model to use (Transformer, etc.)')
 
@@ -56,7 +57,7 @@ test_data = get_data(args, 'test')
 
 train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
-test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
+test_loader = DataLoader(test_data, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers)
 print('Finish loading the data....')
 
 
