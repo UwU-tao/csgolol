@@ -38,13 +38,16 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
 
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=hyp_params.when, factor=0.1, verbose=True)
 
+    linear = nn.nn.Linear(786, 20)
+    
     settings = {'model': model,
                 'bert': bert,
                 'tokenizer': tokenizer,
                 'feature_extractor': feature_extractor,
                 'optimizer': optimizer,
                 'criterion': criterion,
-                'scheduler': scheduler}
+                'scheduler': scheduler,
+                'linear': linear}
 
     return train_model(settings, hyp_params, train_loader, valid_loader, test_loader)
 
@@ -64,7 +67,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
     scheduler = settings['scheduler']
 
-
+    linear = settings['linear']
+    
     def train(model, bert, tokenizer, feature_extractor, optimizer, criterion):
         epoch_loss = 0
         model.train()
@@ -100,12 +104,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
             with torch.no_grad():
               outs = bert(**text_encoded)
-
-            # last_hidden, pooled_output = bert(
-            #     input_ids=input_ids,
-            #     attention_mask=attention_mask
-            # )
-
+            
+            outs = linear(outs)
             optimizer.zero_grad()
             outputs = model(
                 last_hidden=outs.last_hidden_state,
@@ -174,11 +174,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 
                 with torch.no_grad():
                   outs = bert(**text_encoded)
-                # last_hidden, pooled_output = bert(
-                #     input_ids=input_ids,
-                #     attention_mask=attention_mask
-                # )
-
+                  
+                outs = linear(outs)
                 outputs = model(
                     last_hidden=outs.last_hidden_state,
                     pooled_output=outs.pooler_output,
