@@ -44,7 +44,7 @@ class MyDataset(Dataset):
             idx = idx.tolist()
 
         img_name = self.data_dict.iloc[idx,0]
-        image = Image.open(img_name).convert('RGB')
+        image = Image.open(img_name.strip()).convert('RGB')
         
         label = self.data_dict.iloc[idx,1]
         indeces = torch.LongTensor([self.genres.index(e) for e in label])

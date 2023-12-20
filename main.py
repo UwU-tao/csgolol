@@ -17,7 +17,7 @@ parser.add_argument('--data_path', type=str, default='data/dataset', help='path 
 parser.add_argument('--mlp_dropout', type=float, default=0.2, help='fully connected layers dropout')
 
 # Architecture
-parser.add_argument('--bert_model', type=str, default="bert-base-cased", help='pretrained bert model to use')
+parser.add_argument('--bert_model', type=str, default="bert-base-uncased", help='pretrained bert model to use')
 parser.add_argument('--cnn_model', type=str, default="vgg16", help='pretrained CNN to use for image feature extraction')
 parser.add_argument('--image_feature_size', type=int, default=4096, help='image feature size extracted from pretrained CNN (default: 4096)')
 parser.add_argument('--bert_hidden_size', type=int, default=200, help='bert hidden size for each word token (default: 768)')

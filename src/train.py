@@ -83,8 +83,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             
             text_encoded = tokenizer(input_ids, padding=True)
 
-            input_ids = text_encoded['input_ids'].to(hyp_params.device)
-            attention_mask = text_encoded['attention_mask'].to(hyp_params.device)
+            input_ids = torch.tensor(text_encoded['input_ids']).to(hyp_params.device)
+            attention_mask = torch.tensor(text_encoded['attention_mask']).to(hyp_params.device)
             
             targets.to(hyp_params.device)
             images.to(hyp_params.device)
@@ -155,8 +155,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 
                 text_encoded = tokenizer(input_ids, padding=True)
 
-                input_ids = text_encoded['input_ids'].to(hyp_params.device)
-                attention_mask = text_encoded['attention_mask'].to(hyp_params.device)
+                input_ids = torch.tensor(text_encoded['input_ids']).to(hyp_params.device)
+                attention_mask = torch.tensor(text_encoded['attention_mask']).to(hyp_params.device)
                 targets.to(hyp_params.device)
                 images.to(hyp_params.device)
 

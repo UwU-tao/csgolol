@@ -50,7 +50,7 @@ class AverageBERTModel(nn.Module):
         self.linear2 = nn.Linear(512, hyp_params.output_dim)
 
     def forward(self, last_hidden, pooled_output, feature_images):
-
+        
         mean_hidden = torch.mean(last_hidden, dim = 1)
 
         x = torch.cat((mean_hidden, feature_images), dim=1)
