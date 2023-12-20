@@ -61,7 +61,7 @@ for ftype in data.keys():
           idx.append(i)
 
   data[ftype].drop(idx, inplace=True)
-  data[ftype].reset_index(drop=True, inplace=True)
+  data[ftype].reset_index(drop=True)
   
 data['train'].to_csv('data/dataset/train.dat', index=False, header=False)
 data['dev'].to_csv('data/dataset/dev.dat', index=False, header=False)
