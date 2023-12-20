@@ -57,6 +57,6 @@ class MyDataset(Dataset):
 
         sample = {'image': image,
                   'input_ids': text,
-                  "label": label.type(torch.FloatTensor)}
+                  "label": label.type(torch.cuda.FloatTensor)}
 
         return sample
