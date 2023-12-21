@@ -159,7 +159,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                     feature_images = feature_extractor.features(images)
                     feature_images = feature_extractor.avgpool(feature_images)
                     feature_images = torch.flatten(feature_images, 1)
-                    feature_images = feature_extractor.classifier[0](feature_images)
+                    feature_images = feature_extractor.classifier(feature_images)
                 
                 with torch.no_grad():
                   outs = bert(**text_encoded)
