@@ -118,10 +118,11 @@ class CSGOLOLModel(nn.Module):
         
     def forward(self, text_encoded, images):
         with torch.no_grad():
-            outs = self.bert(**text_encoded)
+            outs = self.bert(text_encoded)
 
         text = outs.last_hidden_state
         images = self.ext(images)
+        print(text.shape, images.shape)
         outs = self.ReLU(torch.cat((text, images), dim=1))
         outs = self.dropout(outs)
         outs = self.linear1(outs)
