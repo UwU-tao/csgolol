@@ -120,10 +120,8 @@ class CSGOLOLModel(nn.Module):
         with torch.no_grad():
             outs = self.bert(**text_encoded)
 
-        text = outs.last_hidden_state
         images = self.ext(images)
-        print(text.shape, images.shape)
-        outs = self.ReLU(torch.cat((text, images), dim=1))
+        outs = self.ReLU(torch.cat((outs.pooler_output, images), dim=1))
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
