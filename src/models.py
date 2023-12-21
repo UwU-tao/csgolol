@@ -129,8 +129,8 @@ class CSGOLOLModel(nn.Module):
         self.dropout = nn.Dropout(0.5)
         self.linear2 = nn.Linear(512, 18, bias=True)
         
-    def forward(self, text_encoded, feature_images):
-        outs = self.ext(feature_images)
+    def forward(self, text_encoded, images):
+        outs = self.ext(images)
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
         outs = self.linear1(outs)

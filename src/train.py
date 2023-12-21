@@ -107,7 +107,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             #     pooled_output=outs.pooler_output,
             #     feature_images=feature_images
             # )
-            outputs = model(text_encoded, feature_images)
+            outputs = model(text_encoded, images)
             preds = outputs
             
             preds_round = (preds > 0.5).float()
