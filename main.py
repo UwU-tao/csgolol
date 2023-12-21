@@ -23,7 +23,7 @@ parser.add_argument('--image_feature_size', type=int, default=4096, help='image 
 parser.add_argument('--bert_hidden_size', type=int, default=768, help='bert hidden size for each word token (default: 768)')
 
 # Tuning
-parser.add_argument('--batch_size', type=int, default=32, metavar='N', help='batch size (default: 8)')
+parser.add_argument('--batch_size', type=int, default=128, metavar='N', help='batch size (default: 8)')
 parser.add_argument('--max_token_length', type=int, default=10, help='max number of tokens per sentence (default: 50)')
 parser.add_argument('--clip', type=float, default=0.8, help='gradient clip value (default: 0.8)')
 parser.add_argument('--lr', type=float, default=2e-5, help='initial learning rate (default: 2e-5)')
