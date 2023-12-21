@@ -66,8 +66,6 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
     criterion = settings['criterion']
 
     scheduler = settings['scheduler']
-
-    linear = settings['linear']
     
     def train(model, bert, tokenizer, feature_extractor, optimizer, criterion):
         epoch_loss = 0
