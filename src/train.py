@@ -39,6 +39,9 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
 
     linear = nn.Linear(786, 20)
     
+    hyp_params.bert = bert
+    hyp_paarms.feature_extractor = feature_extractor
+    
     settings = {'model': model,
                 'bert': bert,
                 'tokenizer': tokenizer,
@@ -85,24 +88,18 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             images = data_batch['image']
             
             text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
-
-            input_ids = text_encoded['input_ids'].clone().detach().to(hyp_params.device)
-            attention_mask = text_encoded['attention_mask'].clone().detach().to(hyp_params.device)
             
             targets = targets.to(hyp_params.device)
             images = images.to(hyp_params.device)
             
-            if images.size()[0] != input_ids.size()[0]:
-                continue
-            
-            with torch.no_grad():
-                feature_images = feature_extractor.features(images)
-                feature_images = feature_extractor.avgpool(feature_images)
-                feature_images = torch.flatten(feature_images, 1)
-            feature_images = feature_extractor.classifier(feature_images)
+            # with torch.no_grad():
+            #     feature_images = feature_extractor.features(images)
+            #     feature_images = feature_extractor.avgpool(feature_images)
+            #     feature_images = torch.flatten(feature_images, 1)
+            #     feature_images = feature_extractor.classifier(feature_images)
 
-            with torch.no_grad():
-              outs = bert(**text_encoded)
+            # with torch.no_grad():
+            #   outs = bert(**text_encoded)
             
             optimizer.zero_grad()
             # outputs = model(
@@ -110,9 +107,9 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             #     pooled_output=outs.pooler_output,
             #     feature_images=feature_images
             # )
-            outputs = model(feature_images)
-    
+            outputs = model(text_encoded, feature_images)
             preds = outputs
+            
             preds_round = (preds > 0.5).float()
             loss = criterion(outputs, targets)
             losses.append(loss.item())
@@ -146,32 +143,25 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 images = data_batch['image']
                 
                 text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
- 
-                input_ids = text_encoded['input_ids'].clone().detach().to(hyp_params.device)
-                attention_mask = text_encoded['attention_mask'].clone().detach().to(hyp_params.device)
 
                 targets = targets.to(hyp_params.device)
                 images = images.to(hyp_params.device)
 
-                if images.size()[0] != input_ids.size()[0]:
-                    continue
-
-                with torch.no_grad():
-                    feature_images = feature_extractor.features(images)
-                    feature_images = feature_extractor.avgpool(feature_images)
-                    feature_images = torch.flatten(feature_images, 1)
-                    feature_images = feature_extractor.classifier(feature_images)
+                # with torch.no_grad():
+                #     feature_images = feature_extractor.features(images)
+                #     feature_images = feature_extractor.avgpool(feature_images)
+                #     feature_images = torch.flatten(feature_images, 1)
+                #     feature_images = feature_extractor.classifier(feature_images)
                 
-                with torch.no_grad():
-                  outs = bert(**text_encoded)
+                # with torch.no_grad():
+                #   outs = bert(**text_encoded)
                 
                 # outputs = model(
                 #     last_hidden=outs.last_hidden_state,
                 #     pooled_output=outs.pooler_output,
                 #     feature_images=feature_images
                 # )
-                outputs = model(feature_images)
-                
+                outputs = model(text_encoded, feature_images)
                 preds = outputs
                 
                 total_loss += criterion(outputs, targets).item() * hyp_params.batch_size

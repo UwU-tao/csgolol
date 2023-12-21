@@ -117,3 +117,24 @@ class MVLModel(nn.Module):
         out = self.dropout(out)
         out = self.lin2(out)
         return out
+
+class CSGOLOLModel(nn.Module):
+    def __init__(self, hyp_params):
+        super(CSGOLOLModel, self).__init__()
+        self.bert = hyp_params.bert
+        self.ext = hyp_params.feature_extractor
+        
+        self.linear1 = nn.Linear(1000, 512, bias=True)
+        self.ReLU = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(0.5)
+        self.linear2 = nn.Linear(512, 18, bias=True)
+        
+    def forward(self, text_encoded, feature_images):
+        outs = self.ext(feature_images)
+        outs = self.ReLU(outs)
+        outs = self.dropout(outs)
+        outs = self.linear1(outs)
+        outs = self.ReLU(outs)
+        outs = self.dropout(outs)
+        outs = self.linear2(outs)
+        return outs
