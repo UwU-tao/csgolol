@@ -25,4 +25,7 @@ def multiclass_acc(results, truths):
     preds = results.view(-1).cpu().detach().numpy()
     truth = truths.view(-1).cpu().detach().numpy()
 
+    preds = np.where(preds > 0.5, 1, 0)
+    truth = np.where(truth > 0.5, 1, 0)
+    
     return np.sum(preds == truths) / float(len(truths))
