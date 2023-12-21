@@ -111,7 +111,7 @@ class CSGOLOLModel(nn.Module):
         self.bert = hyp_params.bert
         self.ext = hyp_params.feature_extractor
         
-        self.linear1 = nn.Linear(1768, 512, bias=True)
+        self.linear1 = nn.Linear(768, 512, bias=True)
         self.ReLU = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
         self.linear2 = nn.Linear(512, 18, bias=True)
