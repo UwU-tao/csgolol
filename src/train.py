@@ -156,7 +156,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 #     pooled_output=outs.pooler_output,
                 #     feature_images=feature_images
                 # )
-                outputs = model(text_encoded, images)
+                outputs = model(text_encoded, images, hyp_params.gamma)
                 preds = outputs
                 
                 total_loss += criterion(outputs, targets).item() * hyp_params.batch_size
