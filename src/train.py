@@ -32,7 +32,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     bert.to(hyp_params.device)
     feature_extractor.to(hyp_params.device)
 
-    optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr)
+    optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr, weight_decay=1e-4)
     criterion = getattr(nn, hyp_params.criterion)()
 
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=hyp_params.when, factor=0.1, verbose=True)
@@ -99,7 +99,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 feature_images = feature_extractor.features(images)
                 feature_images = feature_extractor.avgpool(feature_images)
                 feature_images = torch.flatten(feature_images, 1)
-                feature_images = feature_extractor.classifier[0](feature_images)
+                feature_images = feature_extractor.classifier(feature_images)
 
             with torch.no_grad():
               outs = bert(**text_encoded)
