@@ -106,7 +106,6 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             outputs = model(text_encoded, images)
             preds = outputs
             
-            preds_round = (preds > 0.5).float()
             loss = criterion(outputs, targets)
             losses.append(loss.item())
             loss.backward()

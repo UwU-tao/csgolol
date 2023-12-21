@@ -105,33 +105,24 @@ class GatedAverageBERTModel(nn.Module):
 
         return self.linear1(x)
 
-class MVLModel(nn.Module):
-    def __init__(self, hyp_params):
-        super(MVLModel, self).__init__()
-        self.act = nn.ReLU(inplace=True)
-        self.dropout = nn.Dropout(0.5)
-        self.lin2 = nn.Linear(1000, 18, bias=True)
-        
-    def forward(self, x):
-        out = self.act(x)
-        out = self.dropout(out)
-        out = self.lin2(out)
-        return out
-
 class CSGOLOLModel(nn.Module):
     def __init__(self, hyp_params):
         super(CSGOLOLModel, self).__init__()
         self.bert = hyp_params.bert
         self.ext = hyp_params.feature_extractor
         
-        self.linear1 = nn.Linear(1000, 512, bias=True)
+        self.linear1 = nn.Linear(1768, 512, bias=True)
         self.ReLU = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.5)
         self.linear2 = nn.Linear(512, 18, bias=True)
         
     def forward(self, text_encoded, images):
-        outs = self.ext(images)
-        outs = self.ReLU(outs)
+        with torch.no_grad():
+            outs = bert(**text_encoded)
+
+        text = outs.last_hidden_state
+        images = self.ext(images)
+        outs = self.ReLU(torch.cat((text, images), dim=1))
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
