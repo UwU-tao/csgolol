@@ -174,11 +174,11 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
     best_valid = 1e8
     # writer = SummaryWriter('runs/'+hyp_params.model)
-    epsilon = 1e4
+    epsilon = 1e3
     for epoch in range(1, hyp_params.num_epochs+1):
         
         temp = epsilon ** (epoch / hyp_params.num_epochs)
-        gamma = np.tanh(1 / temp)
+        gamma = np.tanh(hyp_params.num_epochs / temp)
         hyp_params.gamma = gamma
         
         train_results, train_truths, train_loss = train(model, bert, tokenizer, feature_extractor, optimizer, criterion)
