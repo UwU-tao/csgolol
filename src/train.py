@@ -20,7 +20,6 @@ import os
 
 
 def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
-    model = getattr(models, hyp_params.model+'Model')(hyp_params)
     bert = BertModel.from_pretrained(hyp_params.bert_model)
     tokenizer = BertTokenizer.from_pretrained(hyp_params.bert_model)
 
@@ -41,6 +40,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     
     hyp_params.bert = bert
     hyp_params.feature_extractor = feature_extractor
+    model = getattr(models, hyp_params.model+'Model')(hyp_params)
     
     settings = {'model': model,
                 'bert': bert,
