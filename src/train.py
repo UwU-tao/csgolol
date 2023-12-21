@@ -105,11 +105,12 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
               outs = bert(**text_encoded)
             
             optimizer.zero_grad()
-            outputs = model(
-                last_hidden=outs.last_hidden_state,
-                pooled_output=outs.pooler_output,
-                feature_images=feature_images
-            )
+            # outputs = model(
+            #     last_hidden=outs.last_hidden_state,
+            #     pooled_output=outs.pooler_output,
+            #     feature_images=feature_images
+            # )
+            outputs = model(feature_images)
     
             preds = outputs
             preds_round = (preds > 0.5).float()
@@ -164,11 +165,13 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 with torch.no_grad():
                   outs = bert(**text_encoded)
                 
-                outputs = model(
-                    last_hidden=outs.last_hidden_state,
-                    pooled_output=outs.pooler_output,
-                    feature_images=feature_images
-                )
+                # outputs = model(
+                #     last_hidden=outs.last_hidden_state,
+                #     pooled_output=outs.pooler_output,
+                #     feature_images=feature_images
+                # )
+                outputs = model(feature_images)
+                
                 preds = outputs
                 
                 total_loss += criterion(outputs, targets).item() * hyp_params.batch_size

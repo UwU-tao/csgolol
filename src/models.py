@@ -110,7 +110,7 @@ class MVLModel(nn.Module):
         super(MVLModel, self).__init__()
         self.act = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.5)
-        self.lin2 = nn.Linear(1000, NUM_CLASSES, bias=True)
+        self.lin2 = nn.Linear(1000, 18, bias=True)
         
     def forward(self, x):
         out = self.act(out)
