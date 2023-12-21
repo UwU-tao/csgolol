@@ -11,7 +11,6 @@ import torch
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch import nn
-from torch.utils.tensorboard import SummaryWriter
 from torchmetrics.classification import MultilabelF1Score, MultilabelRecall, MultilabelPrecision
 from tqdm import tqdm
 
@@ -204,14 +203,6 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             print(f'Epoch  |     Train Loss     |     Train Accuracy     |     Valid Loss     |     Valid Accuracy     |     Precision     |     Recall     |     F1-Score     |')
         
         print(f'{epoch:^7d}|{train_loss:^20.4f}|{train_acc:^24.4f}|{val_loss:^20.4f}|{val_acc:^24.4f}|{val_prec:^19.4f}|{val_recall:^16.4f}|{val_f1:^18.4f}|')
-        
-        # writer.add_scalar('Loss/train', train_loss, epoch)
-        # writer.add_scalar('Accuracy/train', train_acc, epoch)
-        # writer.add_scalar('F1-score/train', train_f1, epoch)
-
-        # writer.add_scalar('Loss/val', val_loss, epoch)
-        # writer.add_scalar('Accuracy/val', val_acc, epoch)
-        # writer.add_scalar('F1-score/val', val_f1, epoch)
 
         if val_loss < best_valid:
             print(f"Saved model at pretrained_models/{hyp_params.name}.pt!")
