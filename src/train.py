@@ -30,17 +30,15 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     bert.to(hyp_params.device)
     feature_extractor.to(hyp_params.device)
 
-    optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr, weight_decay=1e-4)
-    criterion = getattr(nn, hyp_params.criterion)()
-
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=hyp_params.when, factor=0.1, verbose=True)
 
-    linear = nn.Linear(786, 20)
-    
     hyp_params.bert = bert
     hyp_params.feature_extractor = feature_extractor
     model = getattr(models, hyp_params.model+'Model')(hyp_params)
     model.to(hyp_params.device)
+    
+    optimizer = getattr(optim, hyp_params.optim)(model.parameters(), lr=hyp_params.lr, weight_decay=1e-4)
+    criterion = getattr(nn, hyp_params.criterion)()
     
     settings = {'model': model,
                 'bert': bert,
