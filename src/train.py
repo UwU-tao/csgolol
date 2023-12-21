@@ -99,7 +99,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 feature_images = feature_extractor.features(images)
                 feature_images = feature_extractor.avgpool(feature_images)
                 feature_images = torch.flatten(feature_images, 1)
-                feature_images = feature_extractor.classifier(feature_images)
+            feature_images = feature_extractor.classifier(feature_images)
 
             with torch.no_grad():
               outs = bert(**text_encoded)
@@ -199,9 +199,6 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         train_acc, train_prec, train_recall, train_f1 = metrics(train_results, train_truths)
         val_acc, val_prec, val_recall, val_f1 = metrics(val_results, val_truths)
         
-        # print("-"*156)
-        # print('Epoch {:2d} | Train Loss {:5.4f} | Valid Loss {:5.4f} | Valid Acc {:5.4f} | Valid f1-score {:5.4f}'.format(epoch, train_loss, val_loss, val_acc, val_f1))
-        # print("-"*156)
         if epoch == 1:
             print(f'Epoch  |     Train Loss     |     Train Accuracy     |     Valid Loss     |     Valid Accuracy     |     Precision     |     Recall     |     F1-Score     |')
         
