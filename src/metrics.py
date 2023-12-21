@@ -14,9 +14,6 @@ precision = MultilabelPrecision(num_labels=18)
 precision = precision.to(device)
 
 def metrics(results, truths):
-    preds = results.cpu().detach().numpy()
-    truth = truths.cpu().detach().numpy()
-
     f1_score = f1(preds, truth)
     recall = recall(preds, truth)
     precision = precision(preds, truth)
