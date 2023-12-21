@@ -103,7 +103,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             #     pooled_output=outs.pooler_output,
             #     feature_images=feature_images
             # )
-            outputs = model(text_encoded, images)
+            outputs = model(text_encoded, images, hyp_params.gamma)
             preds = outputs
             
             loss = criterion(outputs, targets)
@@ -174,8 +174,13 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
 
     best_valid = 1e8
     # writer = SummaryWriter('runs/'+hyp_params.model)
-    
+    epsilon = 1e4
     for epoch in range(1, hyp_params.num_epochs+1):
+        
+        temp = epsilon ** (epoch / hyp_params.num_epochs)
+        gamma = np.tanh(1 / temp)
+        hyp_params.gamma = gamma
+        
         train_results, train_truths, train_loss = train(model, bert, tokenizer, feature_extractor, optimizer, criterion)
         val_results, val_truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=False)
         

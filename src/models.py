@@ -117,15 +117,16 @@ class CSGOLOLModel(nn.Module):
         self.linear2 = nn.Linear(512, 18, bias=True)
         self.linear_ext = nn.Linear(1000, 768, bias=True)
         
-    def forward(self, text_encoded, images):
+    def forward(self, text_encoded, images, gamma):
         with torch.no_grad():
             outs = self.bert(**text_encoded)
         
         text = torch.mean(outs.last_hidden_state, dim=1)
+        
         images = self.ext(images)
         images = self.linear_ext(images)
         
-        outs = self.ReLU(0.1 * text + 0.9 * images)
+        outs = self.ReLU(gamma * text + (1-gamma) * images)
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
