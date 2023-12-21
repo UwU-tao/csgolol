@@ -113,16 +113,19 @@ class CSGOLOLModel(nn.Module):
         
         self.linear1 = nn.Linear(1768, 512, bias=True)
         self.ReLU = nn.ReLU(inplace=True)
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(0.2)
         self.linear2 = nn.Linear(512, 18, bias=True)
+        self.linear_ext = nn.Linear(1000, 768, bias=True)
         
     def forward(self, text_encoded, images):
         with torch.no_grad():
             outs = self.bert(**text_encoded)
-
+        
+        text = torch.mean(outs.last_hidden_state, dim=1)
         images = self.ext(images)
-        # outs = self.ReLU(torch.cat((outs.pooler_output, images), dim=1))
-        outs = self.ReLU(torch.cat((torch.mean(outs.last_hidden_state, dim=1), images), dim=1))
+        images = self.linear_ext(images)
+        
+        outs = self.ReLU(0.1 * text + 0.9 * images)
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
