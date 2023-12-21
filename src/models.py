@@ -104,3 +104,16 @@ class GatedAverageBERTModel(nn.Module):
         x = self.drop1(x)
 
         return self.linear1(x)
+
+class MVLModel(nn.Module):
+    def __init__(self):
+        super(MVLModel, self).__init__()
+        self.act = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(0.5)
+        self.lin2 = nn.Linear(1000, NUM_CLASSES, bias=True)
+        
+    def forward(self, x):
+        out = self.act(out)
+        out = self.dropout(out)
+        out = self.lin2(out)
+        return out
