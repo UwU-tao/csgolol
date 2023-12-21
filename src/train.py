@@ -85,17 +85,17 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             targets = data_batch["label"]
             images = data_batch['image']
             
-            text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt')
+            text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
 
             input_ids = text_encoded['input_ids'].clone().detach().to(hyp_params.device)
             attention_mask = text_encoded['attention_mask'].clone().detach().to(hyp_params.device)
             
-            targets.to(hyp_params.device)
-            images.to(hyp_params.device)
-
+            targets = targets.to(hyp_params.device)
+            images = images.to(hyp_params.device)
+            
             if images.size()[0] != input_ids.size()[0]:
                 continue
-
+            
             with torch.no_grad():
                 feature_images = feature_extractor.features(images)
                 feature_images = feature_extractor.avgpool(feature_images)
@@ -123,16 +123,6 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             total_loss += loss.item() * hyp_params.batch_size
             results.append(preds)
             truths.append(targets)
-
-            # proc_loss += loss * hyp_params.batch_size
-            # proc_size += hyp_params.batch_size
-            
-            # if i_batch % hyp_params.log_interval == 0 and i_batch > 0:
-            #     train_acc, train_f1 = metrics(preds_round, targets)
-            #     avg_loss = proc_loss / proc_size
-            #     print('Epoch {:2d} | Batch {:3d}/{:3d} | Time/Batch(ms) {:5.2f} | Train Loss {:5.4f} | Train Acc {:5.4f} | Train f1-score {:5.4f}'.
-            #           format(epoch, i_batch, num_batches, elapsed_time * 1000 / hyp_params.log_interval, avg_loss, train_acc, train_f1))
-            # proc_loss, proc_size = 0, 0
                 
         avg_loss = total_loss / hyp_params.n_train
         results = torch.cat(results)
@@ -155,12 +145,13 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 targets = data_batch["label"]
                 images = data_batch['image']
                 
-                text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt')
+                text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
  
                 input_ids = text_encoded['input_ids'].clone().detach().to(hyp_params.device)
                 attention_mask = text_encoded['attention_mask'].clone().detach().to(hyp_params.device)
-                targets.to(hyp_params.device)
-                images.to(hyp_params.device)
+
+                targets = targets.to(hyp_params.device)
+                images = images.to(hyp_params.device)
 
                 if images.size()[0] != input_ids.size()[0]:
                     continue
@@ -195,31 +186,36 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         return results, truths, avg_loss
 
     best_valid = 1e8
-    writer = SummaryWriter('runs/'+hyp_params.model)
+    # writer = SummaryWriter('runs/'+hyp_params.model)
     
     for epoch in range(1, hyp_params.num_epochs+1):
         train_results, train_truths, train_loss = train(model, bert, tokenizer, feature_extractor, optimizer, criterion)
-        results, truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=False)
-        #if test_loader is not None:
-        #    results, truths, val_loss = evaluate(model, feature_extractor, criterion, test=True)
+        val_results, val_truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=False)
+        test_results, test_truths, test_loss = evaluate(model, feature_extractor, criterion, test=True)
+        
         scheduler.step(val_loss)
 
-        train_acc, train_f1 = metrics(train_results, train_truths)
-        val_acc, val_f1 = metrics(results, truths)
-        print("-"*50)
-        print('Epoch {:2d} | Time {:5.4f} sec | Train Loss {:5.4f} | Valid Loss {:5.4f} | Valid Acc {:5.4f} | Valid f1-score {:5.4f}'.format(epoch, duration, train_loss, val_loss, val_acc, val_f1))
-        print("-"*50)
+        train_acc, train_prec, train_recall, train_f1 = metrics(train_results, train_truths)
+        val_acc, val_prec, val_recall, val_f1 = metrics(val_results, val_truths)
         
-        writer.add_scalar('Loss/train', train_loss, epoch)
-        writer.add_scalar('Accuracy/train', train_acc, epoch)
-        writer.add_scalar('F1-score/train', train_f1, epoch)
+        # print("-"*156)
+        # print('Epoch {:2d} | Train Loss {:5.4f} | Valid Loss {:5.4f} | Valid Acc {:5.4f} | Valid f1-score {:5.4f}'.format(epoch, train_loss, val_loss, val_acc, val_f1))
+        # print("-"*156)
+        if epoch == 1:
+            print(f'Epoch  |     Train Loss     |     Train Accuracy     |     Valid Loss     |     Valid Accuracy     |     Precision     |     Recall     |     F1-Score     |')
+        
+        print(f'{epoch:^7d}|{train_loss:^20.4f}|{train_acc:^24.4f}|{val_loss:^20.4f}|{val_acc:^24.4f}|{val_prec:^19.4f}|{val_recall:^16.4f}|{val_f1:^18.4f}|')
+        
+        # writer.add_scalar('Loss/train', train_loss, epoch)
+        # writer.add_scalar('Accuracy/train', train_acc, epoch)
+        # writer.add_scalar('F1-score/train', train_f1, epoch)
 
-        writer.add_scalar('Loss/val', val_loss, epoch)
-        writer.add_scalar('Accuracy/val', val_acc, epoch)
-        writer.add_scalar('F1-score/val', val_f1, epoch)
+        # writer.add_scalar('Loss/val', val_loss, epoch)
+        # writer.add_scalar('Accuracy/val', val_acc, epoch)
+        # writer.add_scalar('F1-score/val', val_f1, epoch)
 
         if val_loss < best_valid:
-            print(f"Saved model at pre_trained_models/{hyp_params.name}.pt!")
+            print(f"Saved model at pretrained_models/{hyp_params.name}.pt!")
             save_model(hyp_params, model, name=hyp_params.name)
             best_valid = val_loss
 
