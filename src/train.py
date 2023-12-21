@@ -40,7 +40,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     linear = nn.Linear(786, 20)
     
     hyp_params.bert = bert
-    hyp_paarms.feature_extractor = feature_extractor
+    hyp_params.feature_extractor = feature_extractor
     
     settings = {'model': model,
                 'bert': bert,
