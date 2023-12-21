@@ -191,7 +191,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
     for epoch in range(1, hyp_params.num_epochs+1):
         train_results, train_truths, train_loss = train(model, bert, tokenizer, feature_extractor, optimizer, criterion)
         val_results, val_truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=False)
-        test_results, test_truths, test_loss = evaluate(model, feature_extractor, criterion, test=True)
+        test_results, test_truths, test_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=True)
         
         scheduler.step(val_loss)
 
