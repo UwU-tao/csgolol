@@ -14,9 +14,9 @@ precision = MultilabelPrecision(num_labels=18)
 precision = precision.to(device)
 
 def metrics(results, truths):
-    f1_score = f1(results, truth)
-    recall = recall(results, truth)
-    precision = precision(results, truth)
+    f1_score = f1(results, truths)
+    recall = recall(results, truths)
+    precision = precision(results, truths)
     acc = multiclass_acc(results, truths)
 
     return acc, prec, recall, f1_score
