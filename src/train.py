@@ -27,7 +27,6 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     for param in feature_extractor.features.parameters():
         param.requires_grad = False
 
-    model.to(hyp_params.device)
     bert.to(hyp_params.device)
     feature_extractor.to(hyp_params.device)
 
@@ -41,6 +40,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
     hyp_params.bert = bert
     hyp_params.feature_extractor = feature_extractor
     model = getattr(models, hyp_params.model+'Model')(hyp_params)
+    model.to(hyp_params.device)
     
     settings = {'model': model,
                 'bert': bert,
