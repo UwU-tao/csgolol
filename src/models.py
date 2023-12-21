@@ -118,7 +118,7 @@ class CSGOLOLModel(nn.Module):
         
     def forward(self, text_encoded, images):
         with torch.no_grad():
-            outs = bert(**text_encoded)
+            outs = self.bert(**text_encoded)
 
         text = outs.last_hidden_state
         images = self.ext(images)
