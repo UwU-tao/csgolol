@@ -106,7 +106,7 @@ class GatedAverageBERTModel(nn.Module):
         return self.linear1(x)
 
 class MVLModel(nn.Module):
-    def __init__(self):
+    def __init__(self, hyp_params):
         super(MVLModel, self).__init__()
         self.act = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.5)
