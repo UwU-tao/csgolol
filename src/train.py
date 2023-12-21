@@ -191,7 +191,6 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
     for epoch in range(1, hyp_params.num_epochs+1):
         train_results, train_truths, train_loss = train(model, bert, tokenizer, feature_extractor, optimizer, criterion)
         val_results, val_truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=False)
-        test_results, test_truths, test_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=True)
         
         scheduler.step(val_loss)
 
@@ -222,7 +221,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
     if test_loader is not None:
         model = load_model(hyp_params, name=hyp_params.name)
         results, truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=True)
-        test_acc, test_f1 = metrics(results, truths)
+        test_acc, test_prec, test_recall, test_f1 = metrics(results, truths)
         
         print("\n\nTest Acc {:5.4f} | Test f1-score {:5.4f}".format(test_acc, test_f1))
 
