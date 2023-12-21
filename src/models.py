@@ -48,12 +48,14 @@ class AverageBERTModel(nn.Module):
         self.bn1 = nn.BatchNorm1d(512)
         self.drop1 = nn.Dropout(p=hyp_params.mlp_dropout)
         self.linear2 = nn.Linear(512, hyp_params.output_dim)
+        self.act = nn.ReLU(inplace=True)
 
     def forward(self, last_hidden, pooled_output, feature_images):
         
         mean_hidden = torch.mean(last_hidden, dim = 1)
 
         x = torch.cat((mean_hidden, feature_images), dim=1)
+        x = self.act(x)
         x = self.drop1(x)
         x = self.linear1(x)
         x = self.bn1(x)
