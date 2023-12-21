@@ -15,11 +15,11 @@ precision = precision.to(device)
 
 def metrics(results, truths):
     f1_score = f1(results, truths)
-    recall = recall(results, truths)
-    precision = precision(results, truths)
+    recall_score = recall(results, truths)
+    precision_score = precision(results, truths)
     acc = multiclass_acc(results, truths)
 
-    return acc, prec, recall, f1_score
+    return acc, precision_score, recall_score, f1_score
 
 def multiclass_acc(results, truths):
     preds = results.view(-1).cpu().detach().numpy()
