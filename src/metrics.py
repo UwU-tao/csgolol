@@ -4,6 +4,8 @@ from torchmetrics.classification import MultilabelF1Score
 from torchmetrics.classification import MultilabelRecall
 from torchmetrics.classification import MultilabelPrecision
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
 f1 = MultilabelF1Score(num_labels=18)
 f1 = f1.to(device)
 recall = MultilabelRecall(num_labels=18)
