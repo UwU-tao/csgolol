@@ -47,8 +47,7 @@ def initiate(hyp_params, train_loader, valid_loader, test_loader=None):
                 'feature_extractor': feature_extractor,
                 'optimizer': optimizer,
                 'criterion': criterion,
-                'scheduler': scheduler,
-                'linear': linear}
+                'scheduler': scheduler}
 
     return train_model(settings, hyp_params, train_loader, valid_loader, test_loader)
 
