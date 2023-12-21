@@ -6,13 +6,13 @@ from torchmetrics.classification import MultilabelPrecision
 from torchmetrics.classification import MultilabelAccuracy
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-f1 = MultilabelF1Score(num_labels=18, average='micro', threshold=0.7)
+f1 = MultilabelF1Score(num_labels=18, average='macro', threshold=0.7)
 f1 = f1.to(device)
-recall = MultilabelRecall(num_labels=18, average='micro', threshold=0.7)
+recall = MultilabelRecall(num_labels=18, average='macro', threshold=0.7)
 recall = recall.to(device)
-precision = MultilabelPrecision(num_labels=18, average='micro', threshold=0.7)
+precision = MultilabelPrecision(num_labels=18, average='macro', threshold=0.7)
 precision = precision.to(device)
-accuracy = MultilabelAccuracy(num_labels=18, average='micro', threshold=0.7)
+accuracy = MultilabelAccuracy(num_labels=18, average='macro', threshold=0.7)
 accuracy = accuracy.to(device)
 
 def metrics(results, truths):

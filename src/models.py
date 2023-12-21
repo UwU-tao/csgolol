@@ -121,7 +121,8 @@ class CSGOLOLModel(nn.Module):
             outs = self.bert(**text_encoded)
 
         images = self.ext(images)
-        outs = self.ReLU(torch.cat((outs.pooler_output, images), dim=1))
+        # outs = self.ReLU(torch.cat((outs.pooler_output, images), dim=1))
+        outs = self.ReLU(torch.cat((torch.mean(outs.last_hidden_state, dim=1), images), dim=1))
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
