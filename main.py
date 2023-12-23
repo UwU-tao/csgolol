@@ -57,7 +57,7 @@ tmp = [0] * n
 for x in movie_ids:
     temp = ratings[ratings.movie_id == x].user_id.tolist()
     for y in temp:
-        tmp[y] = ratings[(ratings.movie_id == x) & (ratings.user_id == y)].rating.values[0]
+        tmp[y-1] = ratings[(ratings.movie_id == x) & (ratings.user_id == y)].rating.values[0]
     res[x] = tmp
     tmp = [0] * n
 
