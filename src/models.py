@@ -144,6 +144,6 @@ class RatingModel(nn.Module):
         
     def forward(self, ratings):
         ratings = self.relu(self.lin1(ratings))
-        ratings = self.dropout(ratings)
+        # ratings = self.dropout(ratings)
         ratings = self.lin2(ratings)
         return ratings
