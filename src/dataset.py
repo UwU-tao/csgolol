@@ -62,7 +62,7 @@ class MyDataset(Dataset):
         temp = self.ratings[self.ratings.movie_id == int(self.data_dict.iloc[idx,3])]
         ratings = []
         for x in range(len(self.ratings.user_id.unique())):
-            if temp.iloc[x,1] == x:
+            if temp.iloc[x,0] == x:
                 ratings.append(temp.iloc[x,2])
             else:
                 ratings.append(0)
