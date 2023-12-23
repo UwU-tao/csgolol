@@ -38,7 +38,7 @@ class MyDataset(Dataset):
                        
         self.num_classes = len(self.genres)
         
-        self.ratings = pd.read_csv(f"{root_dir}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"])
+        self.ratings = pd.read_csv(f"{root_dir}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
         
     def __len__(self):
         return len(self.data_dict)
