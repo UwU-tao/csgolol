@@ -59,7 +59,7 @@ class MyDataset(Dataset):
         if self.transform:
             image = self.transform(image)
         
-        movie_id = self.data_dict.iloc[idx,3]
+        movie_id = int(self.data_dict.iloc[idx,3])
         # temp = self.ratings[self.ratings.movie_id == int(self.data_dict.iloc[idx,3])]
         # ratings = [0] * len(self.ratings.user_id.unique())
         # for x in range(len(self.ratings.user_id.unique())):
