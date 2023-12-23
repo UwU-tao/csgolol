@@ -60,12 +60,10 @@ class MyDataset(Dataset):
             image = self.transform(image)
 
         temp = self.ratings[self.ratings.movie_id == int(self.data_dict.iloc[idx,3])]
-        ratings = []
+        ratings = [0] * len(self.ratings.user_id.unique())
         for x in range(len(self.ratings.user_id.unique())):
-            if temp.iloc[x,0] == x:
-                ratings.append(temp.iloc[x,2])
-            else:
-                ratings.append(0)
+            if x in temp.user_id.values:
+                ratings[x] = temp[temp.user_id == x].rating.values[0]
         
         sample = {'image': image,
                   'input_ids': text,
