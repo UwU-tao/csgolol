@@ -3,7 +3,7 @@ import argparse
 from torch.utils.data import DataLoader
 from src.utils import *
 from src import train
-
+import numpy as np
 import os
 
 parser = argparse.ArgumentParser()
@@ -52,8 +52,20 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ratings = pd.read_csv(f"{args.data_path}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
 movie_ids = ratings.movie_id.unique()
 
-grouped = ratings.groupby('movie_id')[['user_id', 'rating']].apply(lambda x: dict(zip(x['user_id'], x['rating']))).to_dict()
-res = {movie_id: [grouped.get(movie_id, {}).get(user_id, 0) for user_id in range(1, len(ratings.user_id.unique()) + 1)] for movie_id in movie_ids}
+# grouped = ratings.groupby('movie_id')[['user_id', 'rating']].apply(lambda x: dict(zip(x['user_id'], x['rating']))).to_dict()
+# res = {movie_id: [grouped.get(movie_id, {}).get(user_id, 0) for user_id in range(1, len(ratings.user_id.unique()) + 1)] for movie_id in movie_ids}
+res = {}
+n = len(ratings.user_id.unique())
+
+for movie_id in movie_ids:
+    tmp = np.zeros(n)
+    temp = ratings[ratings.movie_id == movie_id]
+    cur_users = temp.user_id.unique()
+    for user in cur_users:
+        tmp[user - 1] = temp[temp.user_id == user].rating.values[0]
+    res[movie_id] = tmp
+        
+
 
 print("Start loading the data....")
 train_data = get_data(args, res, 'train')
