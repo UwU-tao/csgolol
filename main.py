@@ -55,10 +55,9 @@ res = {}
 n = len(ratings.user_id.unique())
 tmp = [0] * n
 for x in movie_ids:
-    temp = ratings[ratings.movie_id == x]
-    for y in range(n):
-        if y in temp.user_id.values:
-            tmp[y] = temp[temp.user_id == y].rating.values[0]
+    temp = ratings[ratings.movie_id == x].user_id.tolist()
+    for y in temp:
+        tmp[y] = ratings[(ratings.movie_id == x) & (ratings.user_id == y)].rating.values[0]
     res[x] = tmp
     tmp = [0] * n
 
