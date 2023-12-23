@@ -52,14 +52,15 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 ratings = pd.read_csv(f"{args.data_path}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
 movie_ids = ratings.movie_id.unique()
 res = {}
-tmp = [0] * len(ratings.user_id.unique())
+n = len(ratings.user_id.unique())
+tmp = [0] * n
 for x in movie_ids:
     temp = ratings[ratings.movie_id == x]
-    for y in range(len(ratings.user_id.unique())):
+    for y in range(n):
         if y in temp.user_id.values:
             tmp[y] = temp[temp.user_id == y].rating.values[0]
     res[x] = tmp
-    tmp = [0] * len(ratings.user_id.unique())
+    tmp = [0] * n
 
 print("Start loading the data....")
 train_data = get_data(args, res, 'train')
