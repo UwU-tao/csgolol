@@ -59,10 +59,10 @@ n = len(ratings.user_id.unique())
 
 for movie_id in movie_ids:
     tmp = np.zeros(n)
-    temp = ratings[ratings.movie_id == movie_id]
-    cur_users = temp.user_id.tolist()
+    cur_users = ratings.loc[ratings['movie_id']==movie_id].user_id.tolist()
+    temp = ratings['rating']
     for user in cur_users:
-        tmp[user - 1] = temp[temp.user_id == user].rating.values[0]
+        tmp[user - 1] = temp[user-1]
     res[movie_id] = tmp
         
 
