@@ -10,20 +10,22 @@ Image.MAX_IMAGE_PIXELS = 1000000000
 
 class MyDataset(Dataset):
 
-    def __init__(self, root_dir, split, transform=None):
+    def __init__(self, root_dir, split, ratings, transform=None):
         title = []
         image = []
         genres = []
-
+        ids = []
+        
         with open(f"{root_dir}/{split}.dat") as f:
             lines = f.readlines()
             for line in lines:
                 movie_id, title_, genre_, img_path = line.split(",")
+                ids.append(movie_id)
                 title.append(title_)
                 image.append(img_path)
                 genres.append(genre_.split("|"))
             
-        self.data_dict = pd.DataFrame({'image': image, 'label': genres, 'text': title})
+        self.data_dict = pd.DataFrame({'image': image, 'label': genres, 'text': title, 'id': ids})
             
         self.root_dir = root_dir
         self.transform = transform
@@ -35,7 +37,9 @@ class MyDataset(Dataset):
                        "Musical", "War", "Children's"]
                        
         self.num_classes = len(self.genres)
-
+        
+        self.ratings = ratings
+        
     def __len__(self):
         return len(self.data_dict)
 
@@ -55,8 +59,15 @@ class MyDataset(Dataset):
         if self.transform:
             image = self.transform(image)
 
+        temp = self.ratings[self.ratings.movie_id == int(self.data_dict.iloc[idx,3])]
+        ratings = [0] * len(self.ratings.user_id.unique())
+        for x in range(len(self.ratings.user_id.unique())):
+            if x in temp.user_id.values:
+                ratings[x] = temp[temp.user_id == x].rating.values[0]
+        
         sample = {'image': image,
                   'input_ids': text,
-                  "label": label.type(torch.FloatTensor)}
+                  "label": label.type(torch.FloatTensor),
+                  "ratings": torch.FloatTensor(ratings),}
 
         return sample

@@ -5,7 +5,8 @@ import os
 
 
 def get_data(args, split='train'):
-    data = MyDataset(args.data_path, split, transform=transforms.Compose([
+    ratings = pd.read_csv(f"{args.data_path}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
+    data = MyDataset(args.data_path, split, ratings, transform=transforms.Compose([
                         transforms.Resize((224, 224)),
                         transforms.ToTensor(),
                         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
