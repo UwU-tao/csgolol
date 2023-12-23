@@ -88,7 +88,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             
             targets = targets.to(hyp_params.device)
             images = images.to(hyp_params.device)
-            
+            ratings = ratings.to(hyp_params.device)
             # with torch.no_grad():
             #     feature_images = feature_extractor.features(images)
             #     feature_images = feature_extractor.avgpool(feature_images)
@@ -142,7 +142,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
 
                 targets = targets.to(hyp_params.device)
-                images = images.to(hyp_params.device)
+                images = images.to(hyp_params.device)            
+                ratings = ratings.to(hyp_params.device)
 
                 # with torch.no_grad():
                 #     feature_images = feature_extractor.features(images)
