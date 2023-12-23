@@ -56,8 +56,9 @@ n = len(ratings.user_id.unique())
 tmp = [0] * n
 for x in movie_ids:
     temp = ratings[ratings.movie_id == x].user_id.tolist()
+    temp2 = ratings[ratings.movie_id == x]
     for y in temp:
-        tmp[y-1] = ratings[(ratings.movie_id == x) & (ratings.user_id == y)].rating.values[0]
+        tmp[y-1] = temp2[temp2.user_id == y].rating.values[0]
     res[x] = tmp
     tmp = [0] * n
 
