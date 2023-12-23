@@ -139,11 +139,11 @@ class RatingModel(nn.Module):
         super(RatingModel, self).__init__()
         self.lin1 = nn.Linear(6040, 1024, bias=True)
         self.relu = nn.ReLU(inplace=True)
-        # self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(0.2)
         self.lin2 = nn.Linear(1024, 18 , bias=True)
         
     def forward(self, ratings):
         ratings = self.relu(self.lin1(ratings))
-        ratings = self.dropout(ratings)
+        # ratings = self.dropout(ratings)
         ratings = self.lin2(ratings)
         return ratings
