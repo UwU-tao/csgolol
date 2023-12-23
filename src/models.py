@@ -137,7 +137,7 @@ class CSGOLOLModel(nn.Module):
 class RatingModel(nn.Module):
     def __init__(self, hyp_params):
         super(RatingModel, self).__init__()
-        self.lin1 = nn.Linear(4060, 1024, bias=True)
+        self.lin1 = nn.Linear(6040, 1024, bias=True)
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
         self.lin2 = nn.Linear(1024, 18 , bias=True)
