@@ -51,22 +51,17 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 ratings = pd.read_csv(f"{args.data_path}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
 movie_ids = ratings.movie_id.unique()
-
-# grouped = ratings.groupby('movie_id')[['user_id', 'rating']].apply(lambda x: dict(zip(x['user_id'], x['rating']))).to_dict()
-# res = {movie_id: [grouped.get(movie_id, {}).get(user_id, 0) for user_id in range(1, len(ratings.user_id.unique()) + 1)] for movie_id in movie_ids}
 res = {}
 n = len(ratings.user_id.unique())
-
+temp = ratings['rating'].values
 for movie_id in movie_ids:
     tmp = np.zeros(n)
     cur_users = ratings.loc[ratings['movie_id']==movie_id].user_id.tolist()
-    temp = ratings['rating']
     for user in cur_users:
         tmp[user - 1] = temp[user-1]
     res[movie_id] = tmp
         
-
-
+        
 print("Start loading the data....")
 train_data = get_data(args, res, 'train')
 valid_data = get_data(args, res, 'dev')
