@@ -4,7 +4,7 @@ import torch
 import os
 
 
-def get_data(args, ratings, split='train'):    
+def get_data(args, ratings, split='train'):
     data = MyDataset(args.data_path, split, ratings, transform=transforms.Compose([
                         transforms.Resize((224, 224)),
                         transforms.ToTensor(),
