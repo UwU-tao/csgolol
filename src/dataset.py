@@ -10,7 +10,7 @@ Image.MAX_IMAGE_PIXELS = 1000000000
 
 class MyDataset(Dataset):
 
-    def __init__(self, root_dir, split, transform=None):
+    def __init__(self, root_dir, split, ratings, transform=None):
         title = []
         image = []
         genres = []
@@ -38,7 +38,7 @@ class MyDataset(Dataset):
                        
         self.num_classes = len(self.genres)
         
-        self.ratings = pd.read_csv(f"{root_dir}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
+        self.ratings = ratings
         
     def __len__(self):
         return len(self.data_dict)
