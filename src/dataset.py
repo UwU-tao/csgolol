@@ -68,6 +68,6 @@ class MyDataset(Dataset):
         sample = {'image': image,
                   'input_ids': text,
                   "label": label.type(torch.FloatTensor),
-                  "ratings": ratings.type(torch.FloatTensor)}
+                  "ratings": torch.FloatTensor(ratings),}
 
         return sample
