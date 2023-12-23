@@ -49,11 +49,21 @@ torch.set_default_tensor_type(torch.FloatTensor)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+ratings = pd.read_csv(f"{args.data_path}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
+res = {}
+tmp = [0] * len(ratings.user_id.unique())
+for x in movie_ids:
+    temp = ratings[ratings.movie_id == x]
+    for y in range(len(ratings.user_id.unique())):
+        if y in temp.user_id.values:
+            tmp[y] = temp[temp.user_id == y].rating.values[0]
+    res[x] = tmp
+    tmp = [0] * len(ratings.user_id.unique())
 
 print("Start loading the data....")
-train_data = get_data(args, 'train')
-valid_data = get_data(args, 'dev')
-test_data = get_data(args, 'test')
+train_data = get_data(args, ratings, 'train')
+valid_data = get_data(args, ratings, 'dev')
+test_data = get_data(args, ratings, 'test')
 
 train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
@@ -68,6 +78,8 @@ hyp_params.n_train, hyp_params.n_valid, hyp_params.n_test = len(train_data), len
 hyp_params.model = args.model.strip()
 hyp_params.output_dim = output_dim
 hyp_params.criterion = criterion
+
+
 
 if __name__ == '__main__':
     test_loss = train.initiate(hyp_params, train_loader, valid_loader, test_loader)
