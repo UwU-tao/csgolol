@@ -142,7 +142,7 @@ class RatingModel(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.lin2 = nn.Linear(1024, 18 , bias=True)
         
-    def forward(self, text_encoded, images, ratings):
+    def forward(self, ratings):
         ratings = self.relu(self.lin1(ratings))
         ratings = self.dropout(ratings)
         ratings = self.lin2(ratings)
