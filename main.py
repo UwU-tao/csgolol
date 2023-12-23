@@ -50,6 +50,7 @@ torch.set_default_tensor_type(torch.FloatTensor)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 ratings = pd.read_csv(f"{args.data_path}/ratings.dat", sep="::", header=None, names=["user_id", "movie_id", "rating", "timestamp"], engine='python')
+movie_ids = ratings.movie_id.unique()
 res = {}
 tmp = [0] * len(ratings.user_id.unique())
 for x in movie_ids:
