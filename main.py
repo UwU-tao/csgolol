@@ -61,9 +61,9 @@ for x in movie_ids:
     tmp = [0] * len(ratings.user_id.unique())
 
 print("Start loading the data....")
-train_data = get_data(args, ratings, 'train')
-valid_data = get_data(args, ratings, 'dev')
-test_data = get_data(args, ratings, 'test')
+train_data = get_data(args, res, 'train')
+valid_data = get_data(args, res, 'dev')
+test_data = get_data(args, res, 'test')
 
 train_loader = DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
 valid_loader = DataLoader(valid_data, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers)
