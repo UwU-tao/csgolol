@@ -119,6 +119,24 @@ class RatingModel(nn.Module):
         ratings = self.lin2(ratings)
         return ratings
 
+class Attention(nn.Module):
+    def __init__(self, input_dim):
+        super(Attention, self).__init__()
+        self.W = nn.Linear(input_dim, 1)
+
+    def forward(self, lstm_out, images):
+        lstm_energy = self.W(lstm_out).unsqueeze(2)
+        images_energy = self.W(images).unsqueeze(1)
+
+        # Calculate attention scores
+        attention_scores = F.softmax(torch.cat((lstm_energy, images_energy), dim=1), dim=1)
+
+        # Weighted combination based on attention scores
+        weighted_lstm = torch.sum(attention_scores[:, :, 0] * lstm_out, dim=1)
+        weighted_images = torch.sum(attention_scores[:, :, 1] * images, dim=1)
+
+        return weighted_lstm, weighted_images
+
 class Basic_concatModel(nn.Module):
     def __init__(self, hyp_params):
         super(Basic_concatModel, self).__init__()
@@ -181,6 +199,8 @@ class Basic_wsModel(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.bn1 = nn.BatchNorm1d(64)
         
+        self.attention = Attention(128)
+        
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
         lstm, (hidden, cell) = self.lstm(lstm)
@@ -191,7 +211,9 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        fused = torch.cat((hidden[-1], images), dim=1)
+        weighted_lstm, weighted_images = self.attention(hidden[-1], images)
+        
+        fused = torch.cat((weighted_lstm, weighted_images), dim=1)
         out = self.dropout(fused)
         out = self.fc1(out)
         out = self.relu(out)
