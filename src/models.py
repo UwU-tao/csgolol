@@ -125,17 +125,22 @@ class Attention(nn.Module):
         self.W = nn.Linear(input_dim, 1)
 
     def forward(self, lstm_out, images):
-        lstm_energy = self.W(lstm_out).unsqueeze(2)
-        images_energy = self.W(images).unsqueeze(1)
+        lstm_energy = self.W(lstm_out)
+        images_energy = self.W(images)
+
+        # Expand dimensions for broadcasting
+        lstm_energy = lstm_energy.unsqueeze(1).expand(-1, images.size(1), -1)
+        images_energy = images_energy.unsqueeze(2).expand(-1, -1, lstm_out.size(1))
 
         # Calculate attention scores
-        attention_scores = F.softmax(torch.cat((lstm_energy, images_energy), dim=1), dim=1)
+        attention_scores = F.softmax(torch.cat((lstm_energy, images_energy), dim=2), dim=2)
 
         # Weighted combination based on attention scores
-        weighted_lstm = torch.sum(attention_scores[:, :, 0] * lstm_out, dim=1)
-        weighted_images = torch.sum(attention_scores[:, :, 1] * images, dim=1)
+        weighted_lstm = torch.sum(attention_scores[:, :, :, 0] * lstm_out.unsqueeze(1), dim=2)
+        weighted_images = torch.sum(attention_scores[:, :, :, 1] * images.unsqueeze(2), dim=1)
 
-        return weighted_lstm, weighted_images
+        return weighted_lstm.squeeze(1), weighted_images
+
 
 class Basic_concatModel(nn.Module):
     def __init__(self, hyp_params):
