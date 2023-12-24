@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from torch.utils.data.dataset import Dataset
+from nltk import wordpunct_tokenize
 
 Image.MAX_IMAGE_PIXELS = 1000000000
 
