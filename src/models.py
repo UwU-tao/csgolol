@@ -169,7 +169,7 @@ class BasicModel(nn.Module):
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
         lstm, (hidden, cell) = self.lstm(lstm)
-        lstm_out = self.dropout(F.relu(self.fc_lstm(hidden[-1])))
+        lstm_out = self.fc_lstm(hidden[-1])
         
         images = self.conv1(image_tensor)
         images = self.pool(F.relu(self.conv2(images)))
@@ -183,3 +183,34 @@ class BasicModel(nn.Module):
         out = self.dropout(out)
         out = self.fc2(out)
         return out
+
+class CSGOLOLModel(nn.Module):
+    def __init__(self, hyp_params):
+        super(CSGOLOLModel, self).__init__()
+        self.ext = hyp_params.feature_extractor
+        
+        self.embed = nn.Embedding(200, 30)
+        self.lstm = nn.LSTM(input_size=30, hidden_size=64, num_layers=2, batch_first=True)
+        self.fc_lstm = nn.Linear(64, 128)
+        
+        self.linear1 = nn.Linear(128, 64, bias=True)
+        self.ReLU = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(0.2)
+        self.linear2 = nn.Linear(64, 18, bias=True)
+        self.linear_ext = nn.Linear(1000, 128, bias=True)
+        
+    def forward(self, text_encoded, images, ratings):
+        lstm = self.embed(text_encoded)
+        lstm, (hidden, cell) = self.lstm(lstm)
+        lstm_out = self.fc_lstm(hidden[-1])
+        
+        images = self.ext(images)
+        images = self.linear_ext(images)
+        
+        outs = self.ReLU(torch.cat((lstm_out, images), dim=1))
+        outs = self.dropout(outs)
+        outs = self.linear1(outs)
+        outs = self.ReLU(outs)
+        outs = self.dropout(outs)
+        outs = self.linear2(outs)
+        return outs
