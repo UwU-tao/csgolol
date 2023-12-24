@@ -202,7 +202,8 @@ class VGG_LSTMModel(nn.Module):
         self.linear1 = nn.Linear(1128, 512, bias=True)
         self.ReLU = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
-        self.linear2 = nn.Linear(64, 18, bias=True)
+        self.linear2 = nn.Linear(512, 64, bias=True)
+        self.linear3 = nn.Linear(64, 18, bias=True)
         # self.linear_ext = nn.Linear(1000, 128, bias=True)
         
     def forward(self, text_encoded, images, ratings):
@@ -219,4 +220,8 @@ class VGG_LSTMModel(nn.Module):
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
         outs = self.linear2(outs)
+        outs = self.ReLU(outs)
+        outs = self.dropout(outs)
+        outs = self.linear3(outs)
+        
         return outs
