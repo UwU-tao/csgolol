@@ -248,6 +248,8 @@ class VGG_LSTM_wsModel(nn.Module):
         self.linear2 = nn.Linear(64, 18, bias=True)
         self.linear_ext = nn.Linear(1000, 128, bias=True)
         
+        self.bn1 = nn.BatchNorm1d(64)
+        
     def forward(self, text_encoded, images, ratings):
         lstm = self.embed(text_encoded)
         lstm, (hidden, cell) = self.lstm(lstm)
@@ -259,6 +261,7 @@ class VGG_LSTM_wsModel(nn.Module):
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
+        outs = self.bn1(outs)
         outs = self.dropout(outs)
         outs = self.linear2(outs)
         
