@@ -137,6 +137,7 @@ class Basic_concatModel(nn.Module):
 
         self.dropout = nn.Dropout(0.2)
         self.relu = nn.ReLU(inplace=True)
+        self.bn1 = nn.BatchNorm1d(2048)
 
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
@@ -151,6 +152,7 @@ class Basic_concatModel(nn.Module):
         out = dropout(out)
         out = self.fc1(out)
         out = self.relu(out)
+        out = self.bn1(out)
         out = self.dropout(out)
         out = self.fc2(out)
         out = self.relu(out)
