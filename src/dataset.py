@@ -97,7 +97,7 @@ class MyDataset(Dataset):
         self.vocab = Vocab(freq_threshold=5, max_size=1000)
         self.vocab.build_vocab(self.data_dict.text.values)
         self.max_title_size = 0
-        for x in self.title:
+        for x in self.data_dict.text.values:
             self.max_title_size = max(self.max_title_size, len(x))
         
         
