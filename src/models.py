@@ -177,7 +177,7 @@ class BasicModel(nn.Module):
         images = self.pool(F.relu(self.conv2(images)))
         images = self.pool(F.relu(self.conv3(images)))
         images = torch.flatten(images, 1)
-        # images = self.fc_cnn(images)
+        images = self.fc_cnn(images)
         
         # out = torch.cat((hidden[-1], images), dim=1)
         out = self.dropout(hidden[-1] * 0.3 + images * 0.7)
