@@ -131,11 +131,6 @@ class MyDataset(Dataset):
             image = self.transform(image)
         
         movie_id = int(self.data_dict.iloc[idx,3])
-        # temp = self.ratings[self.ratings.movie_id == int(self.data_dict.iloc[idx,3])]
-        # ratings = [0] * len(self.ratings.user_id.unique())
-        # for x in range(len(self.ratings.user_id.unique())):
-        #     if x in temp.user_id.values:
-        #         ratings[x] = temp[temp.user_id == x].rating.values[0]
         
         sample = {'image': image,
                   'input_ids': title_tensor,

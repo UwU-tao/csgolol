@@ -204,7 +204,7 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
         results, truths, val_loss = evaluate(model, bert, tokenizer, feature_extractor, criterion, test=True)
         test_acc, test_prec, test_recall, test_f1 = metrics(results, truths)
         
-        print("\n\nTest Acc {:5.4f} | Test f1-score {:5.4f}".format(test_acc, test_f1))
+        print("\n\nTest Acc {:5.4f} | Test Precision {:5.4f} | Test Recall {:5.4f} | Test f1-score {:5.4f}".format(test_acc, test_prec, test_recall, test_f1))
 
     sys.stdout.flush()
     
