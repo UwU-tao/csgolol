@@ -194,12 +194,11 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        text_image_concat = torch.cat((hidden[-1], images), dim=1)
-        att_scores = self.fc_att(self.relu(text_image_concat))
+        att_scores = torch.matmul(text_features, image_features.T)
         att_weights = F.softmax(att_scores, dim=1)
         
-        text_attended = torch.mul(text_features, att_weights)
-        image_attended = torch.mul(image_features, att_weights)
+        text_attended = torch.matmul(att_weights, text_features)
+        image_attended = torch.matmul(att_weights.T, image_features)
         
         fused = torch.cat((text_attended, image_attended), dim=1)
         out = self.dropout(fused)
