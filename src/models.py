@@ -305,7 +305,7 @@ class VGG_BERT_concatModel(nn.Module):
     
 class VGG_BERT_wsModel(nn.Module):
     def __init__(self, hyp_params):
-        super(VGG_BERT_concatModel, self).__init__()
+        super(VGG_BERT_wsModel, self).__init__()
         self.bert = hyp_params.bert
         self.ext = hyp_params.feature_extractor
         
