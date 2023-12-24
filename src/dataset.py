@@ -124,7 +124,7 @@ class MyDataset(Dataset):
         title_tensor.append(self.vocab.stoi['<eos>'])
         while (len(title_tensor) < self.max_title_size):
             title_tensor.append(self.vocab.stoi['<pad>'])
-        title_tensor = torch.Tensor(title_tensor)
+        title_tensor = torch.Tensor(title_tensor, dtype=torch.long)
         ###
         
         if self.transform:
