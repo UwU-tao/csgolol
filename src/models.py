@@ -119,31 +119,6 @@ class RatingModel(nn.Module):
         ratings = self.lin2(ratings)
         return ratings
 
-
-class AttentionLayer(nn.Module):
-    def __init__(self, return_sequences=True):
-        super(AttentionLayer, self).__init__()
-        self.return_sequences = return_sequences
-
-    def forward(self, x):
-        seq_length = x.size(1)
-        features = x.size(2)
-
-        self.W = nn.Parameter(torch.randn(features, 1))
-        self.b = nn.Parameter(torch.zeros(seq_length, 1))
-        self.W = self.W.cuda()
-        self.b = self.b.cuda()
-        
-        e = torch.tanh(torch.matmul(x, self.W) + self.b)
-        e = e.squeeze(-1)
-        alpha = F.softmax(e, dim=1)
-        alpha = alpha.unsqueeze(-1)
-        context = x * alpha
-        if not self.return_sequences:
-            context = torch.sum(context, dim=1)
-
-        return context
-
 class Basic_concatModel(nn.Module):
     def __init__(self, hyp_params):
         super(Basic_concatModel, self).__init__()
@@ -205,7 +180,7 @@ class Basic_wsModel(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.bn1 = nn.BatchNorm1d(64)
         
-        self.attention = AttentionLayer(return_sequences=False)
+        self.attention = nn.Linear(256, 1)
         
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
@@ -217,16 +192,14 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        text = self.attention(lstm)
-        images = self.attention(images)
+        att_w = F.softmax(self.attention(torch.cat((hidden[-1], images), dim=1)))
         
-        fused = torch.cat((text, images), dim=1)
-        out = self.dropout(fused)
-        out = self.fc1(out)
-        out = self.relu(out)
-        out = self.bn1(out)
-        out = self.dropout(out)
-        out = self.fc2(out)
+        outs = torch.mul(torch.cat((hidden[-1], images), dim=1), att_w)
+        outs = self.fc1(outs)
+        outs = self.relu(outs)
+        outs = self.bn1(outs)
+        outs = self.dropout(outs)
+        outs = self.fc2(outs)
         
         return out
 
