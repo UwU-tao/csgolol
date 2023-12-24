@@ -201,7 +201,7 @@ class Basic_wsModel(nn.Module):
         outs = self.dropout(outs)
         outs = self.fc2(outs)
         
-        return out
+        return outs
 
 class VGG_LSTM_concatModel(nn.Module):
     def __init__(self, hyp_params):
