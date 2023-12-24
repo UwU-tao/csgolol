@@ -155,7 +155,7 @@ class BasicModel(nn.Module):
         self.pool = nn.MaxPool2d(4, 4)
         self.conv2 = nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1)
         self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
-        self.fc_cnn = nn.Linear(64 * 4 * 4, 128)
+        self.fc_cnn = nn.Linear(64 * 14 * 14, 128)
         
         self.embed = nn.Embedding(200, 30)
         self.lstm = nn.LSTM(input_size=30, hidden_size=256, num_layers=3, batch_first=True)
