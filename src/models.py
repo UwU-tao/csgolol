@@ -149,7 +149,7 @@ class Basic_concatModel(nn.Module):
         images = torch.flatten(images, 1)
         
         out = torch.cat((hidden[-1], images), dim=1)
-        out = dropout(out)
+        out = self.dropout(out)
         out = self.fc1(out)
         out = self.relu(out)
         out = self.bn1(out)
