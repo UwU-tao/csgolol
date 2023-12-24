@@ -166,7 +166,7 @@ class BasicModel(nn.Module):
 
         self.dropout = nn.Dropout(0.2)
 
-    def forward(self, title_tensor, image_tensor):
+    def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
         lstm, (hidden, cell) = self.lstm(lstm)
         lstm_out = self.dropout(F.relu(self.fc_lstm(hidden[-1])))
