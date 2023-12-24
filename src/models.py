@@ -131,7 +131,9 @@ class AttentionLayer(nn.Module):
 
         self.W = nn.Parameter(torch.randn(features, 1))
         self.b = nn.Parameter(torch.zeros(seq_length, 1))
-
+        self.W = self.W.cuda()
+        self.b = self.b.cuda()
+        
         e = torch.tanh(torch.matmul(x, self.W) + self.b)
         e = e.squeeze(-1)
         alpha = F.softmax(e, dim=1)
