@@ -133,7 +133,7 @@ class MyDataset(Dataset):
         movie_id = int(self.data_dict.iloc[idx,3])
         
         sample = {'image': image,
-                  'input_ids': title_tensor,
+                  'input_ids': text,
                   "label": label.type(torch.FloatTensor),
                   "ratings": torch.FloatTensor(self.ratings[movie_id]),}
 
