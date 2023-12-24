@@ -148,6 +148,7 @@ class Basic_concatModel(nn.Module):
         images = torch.flatten(images, 1)
         
         out = torch.cat((hidden[-1], images), dim=1)
+        out = dropout(out)
         out = self.fc1(out)
         out = self.relu(out)
         out = self.dropout(out)
@@ -186,7 +187,7 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        out = self.relu(hidden[-1] * 0.5 + images * 0.5)
+        out = self.dropout(hidden[-1] * 0.5 + images * 0.5)
         out = self.fc1(out)
         out = self.relu(out)
         out = self.dropout(out)
@@ -213,7 +214,7 @@ class VGG_LSTM_concatModel(nn.Module):
         
         images = self.ext(images)
         
-        outs = self.ReLU(torch.cat((hidden[-1], images), dim=1))
+        outs = self.dropout(torch.cat((hidden[-1], images), dim=1))
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
@@ -245,7 +246,8 @@ class VGG_LSTM_wsModel(nn.Module):
         images = self.ext(images)
         images = self.linear_ext(images)
         
-        outs = self.ReLU(hidden[-1] * 0.5 + images * 0.5)
+        outs = hidden[-1] * 0.5 + images * 0.5
+        outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
