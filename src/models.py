@@ -173,14 +173,12 @@ class Basic_wsModel(nn.Module):
         self.embed = nn.Embedding(200, 30)
         self.lstm = nn.LSTM(input_size=30, hidden_size=128, num_layers=2, batch_first=True)
 
-        self.fc1 = nn.Linear(256, 64)
+        self.fc1 = nn.Linear(128, 64)
         self.fc2 = nn.Linear(64, 18)
 
         self.dropout = nn.Dropout(0.2)
         self.relu = nn.ReLU(inplace=True)
         self.bn1 = nn.BatchNorm1d(64)
-        
-        self.attention = nn.Linear(256, 1)
         
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
@@ -192,9 +190,8 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        att_w = F.softmax(self.attention(torch.cat((hidden[-1], images), dim=1)))
-        
-        outs = torch.mul(torch.cat((hidden[-1], images), dim=1), att_w)
+        outs = hidden[-1] * 0.5 + images * 0.5
+        outs = self.dropout(outs)
         outs = self.fc1(outs)
         outs = self.relu(outs)
         outs = self.bn1(outs)
