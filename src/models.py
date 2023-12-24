@@ -150,28 +150,28 @@ class RatingModel(nn.Module):
 
 class BasicModel(nn.Module):
     def __init__(self, hyp_params):
-        super(BasicModel, self).__init__()
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
         self.pool = nn.MaxPool2d(4, 4)
         self.conv2 = nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1)
-        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
-        self.fc_cnn = nn.Linear(64 * 14 * 14, 128)
-        
-        self.embed = nn.Embedding(200, 30)
-        self.lstm = nn.LSTM(input_size=30, hidden_size=64, num_layers=2, batch_first=True)
-        self.fc_lstm = nn.Linear(64, 128)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.fc_cnn = nn.Linear(128 * 14 * 14, 128)
+
+        self.embed = nn.Embedding(vocab_size, embedding_dim)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_dim, num_layers=num_layers, batch_first=True)
+        self.fc_lstm = nn.Linear(hidden_dim, 128)
+        # self.fc_lstm2 = nn.Linear(256, 128)
 
         self.fc1 = nn.Linear(2 * 128, 64)
-        self.fc2 = nn.Linear(64, 18)
+        self.fc2 = nn.Linear(64, num_classes)
 
         self.dropout = nn.Dropout(0.2)
-    
-    def forward(self, text, images, ratings):
-        lstm = self.embed(text)
+
+    def forward(self, title_tensor, image_tensor):
+        lstm = self.embed(title_tensor)
         lstm, (hidden, cell) = self.lstm(lstm)
         lstm_out = self.dropout(F.relu(self.fc_lstm(hidden[-1])))
         
-        images = self.conv1(images)
+        images = self.conv1(image_tensor)
         images = self.pool(F.relu(self.conv2(images)))
         images = self.pool(F.relu(self.conv3(images)))
         images = torch.flatten(images, 1)
