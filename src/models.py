@@ -243,7 +243,6 @@ class VGG_LSTM_concatModel(nn.Module):
         images = self.ext(images)
         
         outs = self.ReLU(torch.cat((hidden[-1], images), dim=1))
-        outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
@@ -262,26 +261,23 @@ class VGG_LSTM_wsModel(nn.Module):
         self.embed = nn.Embedding(200, 30)
         self.lstm = nn.LSTM(input_size=30, hidden_size=128, num_layers=2, batch_first=True)
         
-        self.linear1 = nn.Linear(1128, 512, bias=True)
+        self.linear1 = nn.Linear(128, 64, bias=True)
         self.ReLU = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
-        self.linear2 = nn.Linear(512, 64, bias=True)
-        self.linear3 = nn.Linear(64, 18, bias=True)
+        self.linear2 = nn.Linear(64, 18, bias=True)
+        self.linear_ext = nn.Linear(1000, 128, bias=True)
         
     def forward(self, text_encoded, images, ratings):
         lstm = self.embed(text_encoded)
         lstm, (hidden, cell) = self.lstm(lstm)
         
         images = self.ext(images)
+        images = self.linear_ext(images)
         
-        outs = self.ReLU(torch.cat((hidden[-1], images), dim=1))
-        outs = self.dropout(outs)
+        outs = self.ReLU(hidden[-1] * 0.5 + images * 0.5)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
         outs = self.linear2(outs)
-        outs = self.ReLU(outs)
-        outs = self.dropout(outs)
-        outs = self.linear3(outs)
         
         return outs
