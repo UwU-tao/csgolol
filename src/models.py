@@ -269,6 +269,7 @@ class VGG_BERT_concatModel(nn.Module):
         self.linear2 = nn.Linear(1024, 256, bias=True)
         self.linear3 = nn.Linear(256, 18, bias=True)
         # self.linear_ext = nn.Linear(1000, 768, bias=True)
+        self.bn1 = nn.BatchNorm1d(1024)
         
     def forward(self, text_encoded, images, ratings):
         with torch.no_grad():
@@ -283,6 +284,7 @@ class VGG_BERT_concatModel(nn.Module):
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
+        outs = self.bn1(outs)
         outs = self.dropout(outs)
         outs = self.linear2(outs)
         outs = self.ReLU(outs)
