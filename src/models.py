@@ -194,7 +194,7 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        att_scores = torch.matmul(text_features, image_features.T)
+        att_scores = torch.matmul(hidden[-1], images.T)
         att_weights = F.softmax(att_scores, dim=1)
         
         text_attended = torch.matmul(att_weights, text_features)
