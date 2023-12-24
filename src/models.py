@@ -155,59 +155,65 @@ class BasicModel(nn.Module):
         self.pool = nn.MaxPool2d(4, 4)
         self.conv2 = nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1)
         self.conv3 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
-        self.fc_cnn = nn.Linear(128 * 14 * 14, 128)
+        # self.fc_cnn = nn.Linear(128 * 14 * 14, 128)
 
         self.embed = nn.Embedding(200, 30)
         self.lstm = nn.LSTM(input_size=30, hidden_size=64, num_layers=2, batch_first=True)
         self.fc_lstm = nn.Linear(64, 128)
 
-        self.fc1 = nn.Linear(2 * 128, 64)
-        self.fc2 = nn.Linear(64, 18)
+        self.fc1 = nn.Linear(128 * 14 * 14 + 128, 3136)
+        self.fc2 = nn.Linear(3136, 196)
+        self.fc3 = nn.Linear(196, 18)
 
         self.dropout = nn.Dropout(0.2)
+        self.relu = nn.ReLU(inplace=True)
 
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
         lstm, (hidden, cell) = self.lstm(lstm)
-        lstm_out = self.fc_lstm(hidden[-1])
+        # lstm_out = self.fc_lstm(hidden[-1])
         
         images = self.conv1(image_tensor)
         images = self.pool(F.relu(self.conv2(images)))
         images = self.pool(F.relu(self.conv3(images)))
         images = torch.flatten(images, 1)
-        images = self.fc_cnn(images)
+        # images = self.fc_cnn(images)
         
-        out = torch.cat((lstm_out, images), dim=1)
+        out = torch.cat((hidden[-1], images), dim=1)
+        out = self.dropout(out)
         out = self.fc1(out)
-        out = F.relu(out)
+        out = self.relu(out)
         out = self.dropout(out)
         out = self.fc2(out)
+        out = self.relu(out)
+        out = self.dropout(out)
+        out = self.fc3(out)
         return out
 
-class CSGOLOLModel(nn.Module):
+class VGG_LSTMModel(nn.Module):
     def __init__(self, hyp_params):
         super(CSGOLOLModel, self).__init__()
         self.ext = hyp_params.feature_extractor
         
         self.embed = nn.Embedding(200, 30)
-        self.lstm = nn.LSTM(input_size=30, hidden_size=64, num_layers=2, batch_first=True)
+        self.lstm = nn.LSTM(input_size=30, hidden_size=128, num_layers=2, batch_first=True)
         self.fc_lstm = nn.Linear(64, 128)
         
-        self.linear1 = nn.Linear(128, 64, bias=True)
+        self.linear1 = nn.Linear(1128, 512, bias=True)
         self.ReLU = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
         self.linear2 = nn.Linear(64, 18, bias=True)
-        self.linear_ext = nn.Linear(1000, 128, bias=True)
+        # self.linear_ext = nn.Linear(1000, 128, bias=True)
         
     def forward(self, text_encoded, images, ratings):
         lstm = self.embed(text_encoded)
         lstm, (hidden, cell) = self.lstm(lstm)
-        lstm_out = self.fc_lstm(hidden[-1])
+        # lstm_out = self.fc_lstm(hidden[-1])
         
         images = self.ext(images)
-        images = self.linear_ext(images)
+        # images = self.linear_ext(images)
         
-        outs = self.ReLU(torch.cat((lstm_out, images), dim=1))
+        outs = self.ReLU(torch.cat((hidden[-1], images), dim=1))
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
