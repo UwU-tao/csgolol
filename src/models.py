@@ -132,10 +132,6 @@ class Attention(nn.Module):
         lstm_energy = lstm_energy.unsqueeze(1).expand(-1, images.size(1), -1)
         images_energy = images_energy.unsqueeze(2).expand(-1, -1, lstm_out.size(1))
 
-        # Reshape energies to have the same size for concatenation
-        lstm_energy = lstm_energy.view(-1, images.size(1), lstm_out.size(1))
-        images_energy = images_energy.view(-1, images.size(1), lstm_out.size(1))
-
         # Calculate attention scores
         attention_scores = F.softmax(torch.cat((lstm_energy, images_energy), dim=2), dim=2)
 
@@ -144,6 +140,7 @@ class Attention(nn.Module):
         weighted_images = torch.sum(attention_scores[:, :, :, 1].unsqueeze(-1) * images.unsqueeze(2), dim=1)
 
         return weighted_lstm.squeeze(1), weighted_images
+
 
 
 class Basic_concatModel(nn.Module):
