@@ -157,12 +157,12 @@ class BasicModel(nn.Module):
         self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
         self.fc_cnn = nn.Linear(64 * 4 * 4, 128)
         
-        self.embed = nn.Embedding(vocab_size, embedding_dim)
-        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_dim, num_layers=num_layers, batch_first=True)
+        self.embed = nn.Embedding(200, 30)
+        self.lstm = nn.LSTM(input_size=30, hidden_size=128, num_layers=2, batch_first=True)
         self.fc_lstm = nn.Linear(hidden_dim, 128)
 
         self.fc1 = nn.Linear(2 * 128, 64)
-        self.fc2 = nn.Linear(64, num_classes)
+        self.fc2 = nn.Linear(64, 18)
 
         self.dropout = nn.Dropout(0.2)
     
