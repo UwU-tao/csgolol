@@ -192,7 +192,7 @@ class BasicModel(nn.Module):
 
 class VGG_LSTMModel(nn.Module):
     def __init__(self, hyp_params):
-        super(CSGOLOLModel, self).__init__()
+        super(VGG_LSTMModel, self).__init__()
         self.ext = hyp_params.feature_extractor
         
         self.embed = nn.Embedding(200, 30)
