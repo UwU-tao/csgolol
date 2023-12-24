@@ -214,6 +214,8 @@ class VGG_LSTM_concatModel(nn.Module):
         self.linear2 = nn.Linear(512, 64, bias=True)
         self.linear3 = nn.Linear(64, 18, bias=True)
         
+        self.bn1 = nn.BatchNorm1d(512)
+        
     def forward(self, text_encoded, images, ratings):
         lstm = self.embed(text_encoded)
         lstm, (hidden, cell) = self.lstm(lstm)
@@ -223,6 +225,7 @@ class VGG_LSTM_concatModel(nn.Module):
         outs = self.dropout(torch.cat((hidden[-1], images), dim=1))
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
+        outs = self.bn1(outs)
         outs = self.dropout(outs)
         outs = self.linear2(outs)
         outs = self.ReLU(outs)
