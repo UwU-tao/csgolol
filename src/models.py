@@ -158,8 +158,8 @@ class BasicModel(nn.Module):
         self.fc_cnn = nn.Linear(64 * 14 * 14, 128)
         
         self.embed = nn.Embedding(200, 30)
-        self.lstm = nn.LSTM(input_size=30, hidden_size=256, num_layers=3, batch_first=True)
-        self.fc_lstm = nn.Linear(256, 128)
+        self.lstm = nn.LSTM(input_size=30, hidden_size=64, num_layers=2, batch_first=True)
+        self.fc_lstm = nn.Linear(64, 128)
 
         self.fc1 = nn.Linear(2 * 128, 64)
         self.fc2 = nn.Linear(64, 18)
