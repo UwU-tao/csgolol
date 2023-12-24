@@ -158,8 +158,8 @@ class BasicModel(nn.Module):
         # self.fc_cnn = nn.Linear(128 * 14 * 14, 128)
 
         self.embed = nn.Embedding(200, 30)
-        self.lstm = nn.LSTM(input_size=30, hidden_size=64, num_layers=2, batch_first=True)
-        self.fc_lstm = nn.Linear(64, 128)
+        self.lstm = nn.LSTM(input_size=30, hidden_size=128, num_layers=2, batch_first=True)
+        # self.fc_lstm = nn.Linear(64, 128)
 
         self.fc1 = nn.Linear(128 * 14 * 14 + 128, 3136)
         self.fc2 = nn.Linear(3136, 196)
@@ -197,7 +197,7 @@ class VGG_LSTMModel(nn.Module):
         
         self.embed = nn.Embedding(200, 30)
         self.lstm = nn.LSTM(input_size=30, hidden_size=128, num_layers=2, batch_first=True)
-        self.fc_lstm = nn.Linear(64, 128)
+        # self.fc_lstm = nn.Linear(64, 128)
         
         self.linear1 = nn.Linear(1128, 512, bias=True)
         self.ReLU = nn.ReLU(inplace=True)
