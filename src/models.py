@@ -302,3 +302,39 @@ class VGG_BERT_concatModel(nn.Module):
         outs = self.linear3(outs)
         
         return outs
+    
+class VGG_BERT_wsModel(nn.Module):
+    def __init__(self, hyp_params):
+        super(VGG_BERT_concatModel, self).__init__()
+        self.bert = hyp_params.bert
+        self.ext = hyp_params.feature_extractor
+        
+        self.linear1 = nn.Linear(768, 512, bias=True)
+        self.ReLU = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(0.2)
+        self.linear2 = nn.Linear(512, 128, bias=True)
+        self.linear3 = nn.Linear(128, 18, bias=True)
+        self.linear_ext = nn.Linear(1000, 768, bias=True)
+        self.bn1 = nn.BatchNorm1d(512)
+        
+    def forward(self, text_encoded, images, ratings):
+        with torch.no_grad():
+            outs = self.bert(**text_encoded)
+        
+        text = torch.mean(outs.last_hidden_state, dim=1)
+        
+        images = self.ext(images)
+        images = self.linear_ext(images)
+        
+        outs = text * 0.5 + images * 0.5
+        outs = self.dropout(outs)
+        outs = self.linear1(outs)
+        outs = self.ReLU(outs)
+        outs = self.bn1(outs)
+        outs = self.dropout(outs)
+        outs = self.linear2(outs)
+        outs = self.ReLU(outs)
+        outs = self.dropout(outs)
+        outs = self.linear3(outs)
+        
+        return outs
