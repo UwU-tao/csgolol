@@ -191,7 +191,8 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        out = self.dropout(hidden[-1] * 0.5 + images * 0.5)
+        fused = torch.cat((lstm_out, images), dim=1)
+        out = self.dropout(fused)
         out = self.fc1(out)
         out = self.relu(out)
         out = self.bn1(out)
