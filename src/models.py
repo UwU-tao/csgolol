@@ -167,9 +167,9 @@ class BasicModel(nn.Module):
         self.dropout = nn.Dropout(0.2)
     
     def forward(self, text, images, ratings):
-        text = self.embed(text)
-        text, _ = self.lstm(text)
-        text = self.fc_lstm(text[:, -1, :])
+        lstm = self.embed(title_tensor)
+        lstm, (hidden, cell) = self.lstm(lstm)
+        lstm_out = self.dropout(F.relu(self.fc_lstm(hidden[-1])))
         
         images = self.conv1(images)
         images = self.pool(F.relu(self.conv2(images)))
@@ -177,8 +177,9 @@ class BasicModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        out = torch.cat((text, images), dim=1)
+        out = torch.cat((lstm_out, images), dim=1)
         out = self.fc1(out)
+        out = F.relu(out)
         out = self.dropout(out)
         out = self.fc2(out)
         return out
