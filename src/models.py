@@ -120,6 +120,28 @@ class RatingModel(nn.Module):
         return ratings
 
 
+class AttentionLayer(nn.Module):
+    def __init__(self, return_sequences=True):
+        super(AttentionLayer, self).__init__()
+        self.return_sequences = return_sequences
+
+    def forward(self, x):
+        seq_length = x.size(1)
+        features = x.size(2)
+
+        self.W = nn.Parameter(torch.randn(features, 1))
+        self.b = nn.Parameter(torch.zeros(seq_length, 1))
+
+        e = torch.tanh(torch.matmul(x, self.W) + self.b)
+        e = e.squeeze(-1)
+        alpha = F.softmax(e, dim=1)
+        alpha = alpha.unsqueeze(-1)
+        context = x * alpha
+        if not self.return_sequences:
+            context = torch.sum(context, dim=1)
+
+        return context
+
 class Basic_concatModel(nn.Module):
     def __init__(self, hyp_params):
         super(Basic_concatModel, self).__init__()
@@ -181,7 +203,7 @@ class Basic_wsModel(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.bn1 = nn.BatchNorm1d(64)
         
-        self.fc_att = nn.Linear(128, 1)
+        self.attention = AttentionLayer(return_sequences=False)
         
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
@@ -193,13 +215,10 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        att_scores = torch.matmul(hidden[-1], images.T)
-        att_weights = F.softmax(att_scores, dim=1)
+        text = self.attention(lstm)
+        images = self.attention(images)
         
-        text_attended = torch.matmul(att_weights, hidden[-1])
-        image_attended = torch.matmul(att_weights.T, images)
-        
-        fused = torch.cat((text_attended, image_attended), dim=1)
+        fused = torch.cat((text, images), dim=1)
         out = self.dropout(fused)
         out = self.fc1(out)
         out = self.relu(out)
