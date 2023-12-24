@@ -197,8 +197,8 @@ class Basic_wsModel(nn.Module):
         att_scores = torch.matmul(hidden[-1], images.T)
         att_weights = F.softmax(att_scores, dim=1)
         
-        text_attended = torch.matmul(att_weights, text_features)
-        image_attended = torch.matmul(att_weights.T, image_features)
+        text_attended = torch.matmul(att_weights, hidden[-1])
+        image_attended = torch.matmul(att_weights.T, images)
         
         fused = torch.cat((text_attended, image_attended), dim=1)
         out = self.dropout(fused)
