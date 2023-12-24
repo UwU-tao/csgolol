@@ -285,7 +285,8 @@ class VGG_BERT_concatModel(nn.Module):
         with torch.no_grad():
             outs = self.bert(**text_encoded)
         
-        text = torch.mean(outs.last_hidden_state, dim=1)
+        # text = torch.mean(outs.last_hidden_state, dim=1)
+        text = outs.pooler_output
         
         images = self.ext(images)
         # images = self.linear_ext(images)
