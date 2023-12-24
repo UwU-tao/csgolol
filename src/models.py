@@ -104,35 +104,6 @@ class GatedAverageBERTModel(nn.Module):
         x = self.drop1(x)
 
         return self.linear1(x)
-
-class CSGOLOLModel(nn.Module):
-    def __init__(self, hyp_params):
-        super(CSGOLOLModel, self).__init__()
-        self.bert = hyp_params.bert
-        self.ext = hyp_params.feature_extractor
-        
-        self.linear1 = nn.Linear(768, 512, bias=True)
-        self.ReLU = nn.ReLU(inplace=True)
-        self.dropout = nn.Dropout(0.2)
-        self.linear2 = nn.Linear(512, 18, bias=True)
-        self.linear_ext = nn.Linear(1000, 768, bias=True)
-        
-    def forward(self, text_encoded, images):
-        with torch.no_grad():
-            outs = self.bert(**text_encoded)
-        
-        text = torch.mean(outs.last_hidden_state, dim=1)
-        
-        images = self.ext(images)
-        images = self.linear_ext(images)
-        
-        outs = self.ReLU(gamma * text + (1-gamma) * images)
-        outs = self.dropout(outs)
-        outs = self.linear1(outs)
-        outs = self.ReLU(outs)
-        outs = self.dropout(outs)
-        outs = self.linear2(outs)
-        return outs
     
 class RatingModel(nn.Module):
     def __init__(self, hyp_params):
@@ -279,5 +250,39 @@ class VGG_LSTM_wsModel(nn.Module):
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
         outs = self.linear2(outs)
+        
+        return outs
+    
+class VGG_BERT_concatModel(nn.Module):
+    def __init__(self, hyp_params):
+        super(VGG_BERT_concatModel, self).__init__()
+        self.bert = hyp_params.bert
+        self.ext = hyp_params.feature_extractor
+        
+        self.linear1 = nn.Linear(1768, 1024, bias=True)
+        self.ReLU = nn.ReLU(inplace=True)
+        self.dropout = nn.Dropout(0.2)
+        self.linear2 = nn.Linear(1024, 256, bias=True)
+        self.linear3 = nn.Linear(256, 18, bias=True)
+        # self.linear_ext = nn.Linear(1000, 768, bias=True)
+        
+    def forward(self, text_encoded, images, ratings):
+        with torch.no_grad():
+            outs = self.bert(**text_encoded)
+        
+        text = torch.mean(outs.last_hidden_state, dim=1)
+        
+        images = self.ext(images)
+        # images = self.linear_ext(images)
+        
+        outs = torch.cat((text, images), dim=1)
+        outs = self.dropout(outs)
+        outs = self.linear1(outs)
+        outs = self.ReLU(outs)
+        outs = self.dropout(outs)
+        outs = self.linear2(outs)
+        outs = self.ReLU(outs)
+        outs = self.dropout(outs)
+        outs = self.linear3(outs)
         
         return outs

@@ -84,8 +84,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             images = data_batch['image']
             ratings = data_batch['ratings']
             
-            # text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
-            input_ids = input_ids.to(hyp_params.device)
+            text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
+            # input_ids = input_ids.to(hyp_params.device)
             targets = targets.to(hyp_params.device)
             images = images.to(hyp_params.device)
             ratings = ratings.to(hyp_params.device)
@@ -104,8 +104,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
             #     pooled_output=outs.pooler_output,
             #     feature_images=feature_images
             # )
-            # outputs = model(text_encoded, images, ratings)
-            outputs = model(input_ids, images, ratings)
+            outputs = model(text_encoded, images, ratings)
+            # outputs = model(input_ids, images, ratings)
             preds = outputs
             
             loss = criterion(outputs, targets)
@@ -140,8 +140,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 images = data_batch['image']
                 ratings = data_batch['ratings']
                 
-                # text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
-                input_ids = input_ids.to(hyp_params.device)
+                text_encoded = tokenizer(input_ids, padding=True, return_tensors='pt').to(hyp_params.device)
+                # input_ids = input_ids.to(hyp_params.device)
                 targets = targets.to(hyp_params.device)
                 images = images.to(hyp_params.device)            
                 ratings = ratings.to(hyp_params.device)
@@ -160,8 +160,8 @@ def train_model(settings, hyp_params, train_loader, valid_loader, test_loader):
                 #     pooled_output=outs.pooler_output,
                 #     feature_images=feature_images
                 # )
-                # outputs = model(text_encoded, images, ratings)
-                outputs = model(input_ids, images, ratings)
+                outputs = model(text_encoded, images, ratings)
+                # outputs = model(input_ids, images, ratings)
                 preds = outputs
                 
                 total_loss += criterion(outputs, targets).item() * hyp_params.batch_size
