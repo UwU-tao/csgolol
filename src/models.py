@@ -162,7 +162,7 @@ class BasicModel(nn.Module):
         self.fc_lstm = nn.Linear(64, 128)
 
         self.fc1 = nn.Linear(2 * 128, 64)
-        self.fc2 = nn.Linear(64, num_classes)
+        self.fc2 = nn.Linear(64, 18)
 
         self.dropout = nn.Dropout(0.2)
 
