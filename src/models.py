@@ -144,6 +144,41 @@ class RatingModel(nn.Module):
         
     def forward(self, ratings):
         ratings = self.relu(self.lin1(ratings))
-        # ratings = self.dropout(ratings)
+        ratings = self.dropout(ratings)
         ratings = self.lin2(ratings)
         return ratings
+
+class BasicModel(nn.Module):
+    def __init__(self, hyp_params):
+        super(BasicModel, self).__init__()
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
+        self.pool = nn.MaxPool2d(4, 4)
+        self.conv2 = nn.Conv2d(16, 64, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        self.fc_cnn = nn.Linear(64 * 4 * 4, 128)
+        
+        self.embed = nn.Embedding(vocab_size, embedding_dim)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_dim, num_layers=num_layers, batch_first=True)
+        self.fc_lstm = nn.Linear(hidden_dim, 128)
+
+        self.fc1 = nn.Linear(2 * 128, 64)
+        self.fc2 = nn.Linear(64, num_classes)
+
+        self.dropout = nn.Dropout(0.2)
+    
+    def forward(self, text, images, ratings):
+        text = self.embed(text)
+        text, _ = self.lstm(text)
+        text = self.fc_lstm(text[:, -1, :])
+        
+        images = self.conv1(images)
+        images = self.pool(F.relu(self.conv2(images)))
+        images = self.pool(F.relu(self.conv3(images)))
+        images = images.view(-1, 64 * 4 * 4)
+        images = self.fc_cnn(images)
+        
+        out = torch.cat((text, images), dim=1)
+        out = self.fc1(out)
+        out = self.dropout(out)
+        out = self.fc2(out)
+        return out

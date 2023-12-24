@@ -61,7 +61,6 @@ for movie_id in movie_ids:
         tmp[user - 1] = temp[user-1]
     res[movie_id] = tmp
         
-        
 print("Start loading the data....")
 train_data = get_data(args, res, 'train')
 valid_data = get_data(args, res, 'dev')
@@ -80,8 +79,6 @@ hyp_params.n_train, hyp_params.n_valid, hyp_params.n_test = len(train_data), len
 hyp_params.model = args.model.strip()
 hyp_params.output_dim = output_dim
 hyp_params.criterion = criterion
-
-
 
 if __name__ == '__main__':
     test_loss = train.initiate(hyp_params, train_loader, valid_loader, test_loader)
