@@ -119,29 +119,6 @@ class RatingModel(nn.Module):
         ratings = self.lin2(ratings)
         return ratings
 
-class Attention(nn.Module):
-    def __init__(self, input_dim):
-        super(Attention, self).__init__()
-        self.W = nn.Linear(input_dim, 1)
-
-    def forward(self, lstm_out, images):
-        lstm_energy = self.W(lstm_out)
-        images_energy = self.W(images)
-
-        # Expand dimensions for broadcasting
-        lstm_energy = lstm_energy.unsqueeze(1).expand(-1, images.size(1), -1)
-        images_energy = images_energy.unsqueeze(2).expand(-1, -1, lstm_out.size(1))
-
-        # Calculate attention scores
-        attention_scores = F.softmax(torch.cat((lstm_energy, images_energy), dim=2), dim=2)
-
-        # Weighted combination based on attention scores
-        weighted_lstm = torch.sum(attention_scores[:, :, :, 0].unsqueeze(-1) * lstm_out.unsqueeze(1), dim=2)
-        weighted_images = torch.sum(attention_scores[:, :, :, 1].unsqueeze(-1) * images.unsqueeze(2), dim=1)
-
-        return weighted_lstm.squeeze(1), weighted_images
-
-
 
 class Basic_concatModel(nn.Module):
     def __init__(self, hyp_params):
@@ -205,7 +182,7 @@ class Basic_wsModel(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.bn1 = nn.BatchNorm1d(64)
         
-        self.attention = Attention(128)
+        self.fc_att = nn.Linear(128, 1)
         
     def forward(self, title_tensor, image_tensor, ratings):
         lstm = self.embed(title_tensor)
@@ -217,9 +194,14 @@ class Basic_wsModel(nn.Module):
         images = torch.flatten(images, 1)
         images = self.fc_cnn(images)
         
-        weighted_lstm, weighted_images = self.attention(hidden[-1], images)
+        text_image_concat = torch.cat((hidden[-1], images), dim=1)
+        att_scores = self.fc_att(self.relu(text_image_concat))
+        att_weights = F.softmax(att_scores, dim=1)
         
-        fused = torch.cat((weighted_lstm, weighted_images), dim=1)
+        text_attended = torch.mul(text_features, att_weights)
+        image_attended = torch.mul(image_features, att_weights)
+        
+        fused = torch.cat((text_attended, image_attended), dim=1)
         out = self.dropout(fused)
         out = self.fc1(out)
         out = self.relu(out)
