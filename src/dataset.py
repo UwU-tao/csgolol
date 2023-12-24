@@ -120,7 +120,7 @@ class MyDataset(Dataset):
         text = self.data_dict.iloc[idx,2]
         ### For LSTM
         title_tensor = [self.vocab.stoi['<sos>']]
-        title_tensor += self.vocab.numericalize(title)
+        title_tensor += self.vocab.numericalize(text)
         title_tensor.append(self.vocab.stoi['<eos>'])
         while (len(title_tensor) < self.max_title_size):
             title_tensor.append(self.vocab.stoi['<pad>'])
