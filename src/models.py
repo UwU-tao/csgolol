@@ -352,19 +352,23 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         super(RatingwVGGnBERT_concatModel, self).__init__()
         self.bert = hyp_params.bert
         self.ext = hyp_params.feature_extractor
-        
-        self.linear1 = nn.Linear(768 * 2 + 1000, 1024, bias=True)
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
-        self.linear2 = nn.Linear(1024, 256, bias=True)
-        self.linear3 = nn.Linear(256, 18, bias=True)
         
-        self.bn1 = nn.BatchNorm1d(1024)
-        self.bn2 = nn.BatchNorm1d(256)
+        self.bert_lin1 = nn.Linear(768, 512, bias=True)
+        self.bert_bn1 = nn.BatchNorm1d(512)
+        self.bert_lin2 = nn.Linear(512, 256, bias=True)
+        self.bert_lin3 = nn.Linear(256, 18, bias=True)
         
-        self.rate_lin1 = nn.Linear(6040, 3020, bias=True)
-        self.rate_lin2 = nn.Linear(3020, 768 , bias=True)
-        self.rate_bn1 = nn.BatchNorm1d(3020)
+        self.vgg_lin1 = nn.Linear(1000, 512, bias=True)
+        self.vgg_bn1 = nn.BatchNorm1d(512)
+        self.vgg_lin2 = nn.Linear(512, 256, bias=True)
+        self.vgg_lin3 = nn.Linear(256, 18, bias=True)
+        
+        self.rate_lin1 = nn.Linear(6040, 512, bias=True)
+        self.rate_bn1 = nn.BatchNorm1d(512)
+        self.rate_lin2 = nn.Linear(512, 256, bias=True)
+        self.rate_lin3 = nn.Linear(256, 18, bias=True)
     
     def forward(self, text_encoded, images, ratings):
         with torch.no_grad():
@@ -375,23 +379,34 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         images = self.ext(images)
         
         ratings = self.relu(self.rate_lin1(ratings))
-        # ratings = self.rate_bn1(ratings)
+        ratings = self.rate_bn1(ratings)
         ratings = self.dropout(ratings)
         ratings = self.rate_lin2(ratings)
+        ratings = self.relu(ratings)
+        ratings = self.dropout(ratings)
+        ratings = self.rate_lin3(ratings)
         
-        outs = torch.cat((text, images, ratings), dim=1)
-        outs = self.dropout(outs)
-        outs = self.linear1(outs)
-        outs = self.relu(outs)
-        outs = self.bn1(outs)
-        outs = self.dropout(outs)
-        outs = self.linear2(outs)
-        outs = self.relu(outs)
-        # outs = self.bn2(outs)
-        outs = self.dropout(outs)
-        outs = self.linear3(outs)
+        text = self.dropout(text)
+        text = self.bert_lin1(text)
+        text = self.relu(text)
+        text = self.bert_bn1(text)
+        text = self.dropout(text)
+        text = self.bert_lin2(text)
+        text = self.relu(text)
+        text = self.dropout(text)
+        text = self.bert_lin3(text)
         
-        return outs
+        images = self.dropout(images)
+        images = self.vgg_lin1(images)
+        images = self.relu(images)
+        images = self.vgg_bn1(images)
+        images = self.dropout(images)
+        images = self.vgg_lin2(images)
+        images = self.relu(images)
+        images = self.dropout(images)
+        images = self.vgg_lin3(images)
+        
+        return (text + images + ratings) / 3
 #Test Acc 0.9450 | Test Precision 0.6527 | Test Recall 0.8672 | Test f1-score 0.7208
 
 class RatingwVGGnBERT_wsModel(nn.Module):
