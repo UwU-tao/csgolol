@@ -357,11 +357,13 @@ class RatingwVGGnBERTModel(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.linear2 = nn.Linear(512, 128, bias=True)
         self.linear3 = nn.Linear(128, 18, bias=True)
+        
         self.linear_ext = nn.Linear(1000, 768, bias=True)
         self.bn1 = nn.BatchNorm1d(512)
         
-        self.lin1 = nn.Linear(6040, 1510, bias=True)
-        self.lin2 = nn.Linear(755, 256 , bias=True)
+        self.rate_lin1 = nn.Linear(6040, 3020, bias=True)
+        self.rate_lin2 = nn.Linear(3020, 768 , bias=True)
+        self.rate_bn1 = nn.BatchNorm1d(3020)
     
     def forward(self, text_encoded, images, ratings):
         with torch.no_grad():
@@ -372,7 +374,12 @@ class RatingwVGGnBERTModel(nn.Module):
         images = self.ext(images)
         images = self.linear_ext(images)
         
-        outs = text * 0.5 + images * 0.5
+        ratings = self.relu(self.rate_lin1(ratings))
+        ratings = self.rate_bn1(ratings)
+        ratings = self.dropout(ratings)
+        ratings = self.rate_lin2(ratings)
+        
+        outs = text * 0.2 + images * 0.3 + ratings * 0.5
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.ReLU(outs)
@@ -382,14 +389,5 @@ class RatingwVGGnBERTModel(nn.Module):
         outs = self.ReLU(outs)
         outs = self.dropout(outs)
         outs = self.linear3(outs)
-        
-        ratings = self.relu(self.lin1(ratings))
-        ratings = self.bn1(ratings)
-        ratings = self.dropout(ratings)
-        ratings = self.lin2(ratings)
-        ratings = self.relu(ratings)
-        ratings = self.dropout(ratings)
-        
-        outs = outs + ratings
         
         return outs
