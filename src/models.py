@@ -331,7 +331,7 @@ class RatingModel(nn.Module):
         self.lin1 = nn.Linear(6040, 1510, bias=True)
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
-        self.lin2 = nn.Linear(755, 256 , bias=True)
+        self.lin2 = nn.Linear(1510, 256 , bias=True)
         self.lin3 = nn.Linear(256, 18, bias=True)
         self.bn1 = nn.BatchNorm1d(1510)
         
