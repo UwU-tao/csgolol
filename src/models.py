@@ -370,6 +370,7 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         self.rate_lin2 = nn.Linear(512, 256, bias=True)
         self.rate_lin3 = nn.Linear(256, 18, bias=True)
     
+        self.out = nn.Linear(18 * 3, 18, bias=True)
     def forward(self, text_encoded, images, ratings):
         with torch.no_grad():
             outs = self.bert(**text_encoded)
@@ -406,7 +407,10 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         images = self.dropout(images)
         images = self.vgg_lin3(images)
         
-        return (text + images + ratings) / 3
+        out = torch.cat((text, images, ratings), dim=1)
+        out = self.out(out)
+        
+        return out
 #Test Acc 0.9450 | Test Precision 0.6527 | Test Recall 0.8672 | Test f1-score 0.7208
 
 class RatingwVGGnBERT_wsModel(nn.Module):
