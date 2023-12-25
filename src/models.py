@@ -355,22 +355,12 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
         
-        self.bert_lin1 = nn.Linear(768, 512, bias=True)
-        self.bert_bn1 = nn.BatchNorm1d(512)
-        self.bert_lin2 = nn.Linear(512, 256, bias=True)
-        self.bert_lin3 = nn.Linear(256, 18, bias=True)
-        
-        self.vgg_lin1 = nn.Linear(1000, 512, bias=True)
-        self.vgg_bn1 = nn.BatchNorm1d(512)
-        self.vgg_lin2 = nn.Linear(512, 256, bias=True)
-        self.vgg_lin3 = nn.Linear(256, 18, bias=True)
-        
-        self.rate_lin1 = nn.Linear(6040, 512, bias=True)
-        self.rate_bn1 = nn.BatchNorm1d(512)
-        self.rate_lin2 = nn.Linear(512, 256, bias=True)
-        self.rate_lin3 = nn.Linear(256, 18, bias=True)
+        self.lin1 = nn.Linear(768 + 1000 + 6040, 1510, bias=True)
+        self.lin2 = nn.Linear(1510, 256 , bias=True)
+        self.lin3 = nn.Linear(256, 18, bias=True)
     
-        self.out = nn.Linear(18 * 3, 18, bias=True)
+        self.bn1 = nn.BatchNorm1d(1510)
+        
     def forward(self, text_encoded, images, ratings):
         with torch.no_grad():
             outs = self.bert(**text_encoded)
@@ -379,36 +369,13 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         
         images = self.ext(images)
         
-        ratings = self.relu(self.rate_lin1(ratings))
-        ratings = self.rate_bn1(ratings)
-        ratings = self.dropout(ratings)
-        ratings = self.rate_lin2(ratings)
-        ratings = self.relu(ratings)
-        ratings = self.dropout(ratings)
-        ratings = self.rate_lin3(ratings)
-        
-        text = self.dropout(text)
-        text = self.bert_lin1(text)
-        text = self.relu(text)
-        text = self.bert_bn1(text)
-        text = self.dropout(text)
-        text = self.bert_lin2(text)
-        text = self.relu(text)
-        text = self.dropout(text)
-        text = self.bert_lin3(text)
-        
-        images = self.dropout(images)
-        images = self.vgg_lin1(images)
-        images = self.relu(images)
-        images = self.vgg_bn1(images)
-        images = self.dropout(images)
-        images = self.vgg_lin2(images)
-        images = self.relu(images)
-        images = self.dropout(images)
-        images = self.vgg_lin3(images)
-        
-        out = torch.cat((text, images, ratings), dim=1)
-        out = self.out(out)
+        outs = torch.cat((text, images, ratings), dim=1)
+        outs = self.relu(self.lin1(outs))
+        outs = self.bn1(outs)
+        outs = self.dropout(outs)
+        outs = self.relu(self.lin2(outs))
+        outs = self.dropout(outs)
+        outs = self.lin3(outs)
         
         return out
 #Test Acc 0.9450 | Test Precision 0.6527 | Test Recall 0.8672 | Test f1-score 0.7208
@@ -446,7 +413,7 @@ class RatingwVGGnBERT_wsModel(nn.Module):
         ratings = self.dropout(ratings)
         ratings = self.rate_lin2(ratings)
         
-        outs = text * 0.2 + images * 0.3 + ratings * 0.5
+        outs = (text + images + ratings) / 3
         outs = self.dropout(outs)
         outs = self.linear1(outs)
         outs = self.relu(outs)
