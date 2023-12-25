@@ -357,8 +357,7 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
         self.linear2 = nn.Linear(1024, 256, bias=True)
-        self.linear3 = nn.Linear(256, 64, bias=True)
-        self.linear4 = nn.Linear(64, 18, bias=True)
+        self.linear3 = nn.Linear(256, 18, bias=True)
         
         self.bn1 = nn.BatchNorm1d(1024)
         self.bn2 = nn.BatchNorm1d(256)
@@ -388,12 +387,9 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         outs = self.dropout(outs)
         outs = self.linear2(outs)
         outs = self.relu(outs)
-        outs = self.bn2(outs)
+        # outs = self.bn2(outs)
         outs = self.dropout(outs)
         outs = self.linear3(outs)
-        outs = self.relu(outs)
-        outs = self.dropout(outs)
-        outs = self.linear4(outs)
         
         return outs
 
