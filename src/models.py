@@ -377,7 +377,7 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         outs = self.dropout(outs)
         outs = self.lin3(outs)
         
-        return out
+        return outs
 #Test Acc 0.9450 | Test Precision 0.6527 | Test Recall 0.8672 | Test f1-score 0.7208
 
 class RatingwVGGnBERT_wsModel(nn.Module):
