@@ -374,7 +374,6 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         text = torch.mean(outs.last_hidden_state, dim=1)
         
         images = self.ext(images)
-        images = self.linear_ext(images)
         
         ratings = self.relu(self.rate_lin1(ratings))
         ratings = self.rate_bn1(ratings)
@@ -424,6 +423,7 @@ class RatingwVGGnBERT_wsModel(nn.Module):
         text = torch.mean(outs.last_hidden_state, dim=1)
         
         images = self.ext(images)
+        images = self.linear_ext(images)
         
         ratings = self.relu(self.rate_lin1(ratings))
         ratings = self.rate_bn1(ratings)
