@@ -108,15 +108,22 @@ class GatedAverageBERTModel(nn.Module):
 class RatingModel(nn.Module):
     def __init__(self, hyp_params):
         super(RatingModel, self).__init__()
-        self.lin1 = nn.Linear(6040, 1024, bias=True)
+        self.lin1 = nn.Linear(6040, 1510, bias=True)
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
-        self.lin2 = nn.Linear(1024, 18 , bias=True)
+        self.lin2 = nn.Linear(755, 256 , bias=True)
+        self.lin3 = nn.Linear(256, 18, bias=True)
+        self.bn1 = nn.BatchNorm1d(1510)
         
     def forward(self, ratings):
         ratings = self.relu(self.lin1(ratings))
+        ratings = self.bn1(ratings)
         ratings = self.dropout(ratings)
         ratings = self.lin2(ratings)
+        ratings = self.relu(ratings)
+        ratings = self.dropout(ratings)
+        ratings = self.lin3(ratings)
+        
         return ratings
 
 class Basic_concatModel(nn.Module):
