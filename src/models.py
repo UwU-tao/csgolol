@@ -345,6 +345,7 @@ class RatingModel(nn.Module):
         ratings = self.lin3(ratings)
         
         return ratings
+# Test Acc 0.9512 | Test Precision 0.7505 | Test Recall 0.7717 | Test f1-score 0.7318
     
 class RatingwVGGnBERTModel(nn.Module):
     def __init__(self, hyp_params):
@@ -382,11 +383,11 @@ class RatingwVGGnBERTModel(nn.Module):
         outs = text * 0.2 + images * 0.3 + ratings * 0.5
         outs = self.dropout(outs)
         outs = self.linear1(outs)
-        outs = self.ReLU(outs)
+        outs = self.relu(outs)
         outs = self.bn1(outs)
         outs = self.dropout(outs)
         outs = self.linear2(outs)
-        outs = self.ReLU(outs)
+        outs = self.relu(outs)
         outs = self.dropout(outs)
         outs = self.linear3(outs)
         
