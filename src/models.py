@@ -375,7 +375,7 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         images = self.ext(images)
         
         ratings = self.relu(self.rate_lin1(ratings))
-        ratings = self.rate_bn1(ratings)
+        # ratings = self.rate_bn1(ratings)
         ratings = self.dropout(ratings)
         ratings = self.rate_lin2(ratings)
         
@@ -392,6 +392,7 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         outs = self.linear3(outs)
         
         return outs
+#Test Acc 0.9450 | Test Precision 0.6527 | Test Recall 0.8672 | Test f1-score 0.7208
 
 class RatingwVGGnBERT_wsModel(nn.Module):
     def __init__(self, hyp_params):
