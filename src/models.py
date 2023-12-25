@@ -349,7 +349,7 @@ class RatingModel(nn.Module):
 
 class RatingwVGGnBERT_concatModel(nn.Module):
     def __init__(self, hyp_params):
-        super(RatingwVGGnBERTModel, self).__init__()
+        super(RatingwVGGnBERT_concatModel, self).__init__()
         self.bert = hyp_params.bert
         self.ext = hyp_params.feature_extractor
         
@@ -400,7 +400,7 @@ class RatingwVGGnBERT_concatModel(nn.Module):
 
 class RatingwVGGnBERT_wsModel(nn.Module):
     def __init__(self, hyp_params):
-        super(RatingwVGGnBERTModel, self).__init__()
+        super(RatingwVGGnBERT_wsModel, self).__init__()
         self.bert = hyp_params.bert
         self.ext = hyp_params.feature_extractor
         
