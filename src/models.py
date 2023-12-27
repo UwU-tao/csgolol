@@ -352,15 +352,20 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         super(RatingwVGGnBERT_concatModel, self).__init__()
         self.bert = hyp_params.bert
         self.ext = hyp_params.feature_extractor
+        
+        self.linear1 = nn.Linear(768 * 2 + 1000, 1024, bias=True)
         self.relu = nn.ReLU(inplace=True)
         self.dropout = nn.Dropout(0.2)
+        self.linear2 = nn.Linear(1024, 256, bias=True)
+        self.linear3 = nn.Linear(256, 18, bias=True)
         
-        self.lin1 = nn.Linear(768 + 1000 + 6040, 1510, bias=True)
-        self.lin2 = nn.Linear(1510, 256 , bias=True)
-        self.lin3 = nn.Linear(256, 18, bias=True)
+        self.bn1 = nn.BatchNorm1d(1024)
+        self.bn2 = nn.BatchNorm1d(256)
+        
+        self.rate_lin1 = nn.Linear(6040, 3020, bias=True)
+        self.rate_lin2 = nn.Linear(3020, 768 , bias=True)
+        self.rate_bn1 = nn.BatchNorm1d(3020)
     
-        self.bn1 = nn.BatchNorm1d(1510)
-        
     def forward(self, text_encoded, images, ratings):
         with torch.no_grad():
             outs = self.bert(**text_encoded)
@@ -369,13 +374,22 @@ class RatingwVGGnBERT_concatModel(nn.Module):
         
         images = self.ext(images)
         
+        ratings = self.relu(self.rate_lin1(ratings))
+        ratings = self.rate_bn1(ratings)
+        ratings = self.dropout(ratings)
+        ratings = self.rate_lin2(ratings)
+        
         outs = torch.cat((text, images, ratings), dim=1)
-        outs = self.relu(self.lin1(outs))
+        outs = self.dropout(outs)
+        outs = self.linear1(outs)
+        outs = self.relu(outs)
         outs = self.bn1(outs)
         outs = self.dropout(outs)
-        outs = self.relu(self.lin2(outs))
+        outs = self.linear2(outs)
+        outs = self.relu(outs)
+        # outs = self.bn2(outs)
         outs = self.dropout(outs)
-        outs = self.lin3(outs)
+        outs = self.linear3(outs)
         
         return outs
 #Test Acc 0.9450 | Test Precision 0.6527 | Test Recall 0.8672 | Test f1-score 0.7208
